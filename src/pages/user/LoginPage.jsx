@@ -4,7 +4,6 @@ import Input from '../../components/common/Input';
 import Button from '../../components/common/Button';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import { FaGoogle } from 'react-icons/fa';
 import { login, clearError } from '../../features/auth/authSlice';
 
 const LoginPage = () => {
@@ -66,6 +65,10 @@ const LoginPage = () => {
     try {
       await dispatch(login(formData)).unwrap();
     } catch (error) {
+      // Hiển thị toast khi đăng nhập thất bại
+      if (error) {
+        toast.error(error);
+      }
     }
   };
 
