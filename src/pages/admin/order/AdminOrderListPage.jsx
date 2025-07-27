@@ -12,9 +12,7 @@ const AdminOrderListPage = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
-    console.log("orders",orders);
     useEffect(() => {
-        console.log("Fetching orders with params:", { page: currentPage, limit: 10, status: statusFilter, search: searchQuery });
         dispatch(getAllOrders({ page: currentPage, limit: 10, status: statusFilter, search: searchQuery }));
     }, [dispatch, currentPage, statusFilter, searchQuery]);
 
@@ -106,18 +104,7 @@ const AdminOrderListPage = () => {
                 <h1 className="text-4xl font-extrabold text-gray-900 leading-tight flex items-center">
                     <FaFilter className="mr-3 text-blue-600" /> Quản lý Đơn Hàng
                 </h1>
-                <div className="flex flex-col sm:flex-row items-center space-y-3 sm:space-y-0 sm:space-x-4 w-full md:w-auto">
-                    <input
-                        type="text"
-                        value={searchQuery}
-                        onChange={(e) => {
-                            setSearchQuery(e.target.value);
-                            setCurrentPage(1);
-                        }}
-                        placeholder="Tìm theo mã đơn, tên khách..."
-                        className="w-full sm:w-64 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-400 transition duration-200"
-                    />
-                </div>
+                
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6 bg-gray-50 p-4 rounded-lg shadow-inner">
@@ -156,6 +143,7 @@ const AdminOrderListPage = () => {
                             <table className="min-w-full divide-y divide-gray-200">
                                 <thead className="bg-gray-100">
                                     <tr>
+                                        <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Số đơn hàng</th>
                                         <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Mã Đơn</th>
                                         <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Tên Khách</th>
                                         <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Tổng Thanh Toán</th>
@@ -165,8 +153,13 @@ const AdminOrderListPage = () => {
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-100">
-                                    {orders.map((order) => (
+                                    {orders.map((order, index) => (
                                         <tr key={order._id} className="hover:bg-blue-50 transition duration-150 ease-in-out">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{
+                                                (pagination && typeof pagination.limit === 'number' && typeof pagination.currentPage === 'number')
+                                                    ? ((pagination.currentPage - 1) * pagination.limit + index + 1)
+                                                    : (((currentPage - 1) * 10) + index + 1)
+                                            }</td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{order.orderCode}</td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order.fullName}</td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">

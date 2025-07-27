@@ -83,7 +83,7 @@ const VerifyOtpPage = () => {
                     <div>
                         <Button
                             type="submit"
-                            className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-lg transition duration-300"
+                            className="w-full bg-blue-600  text-white py-3 rounded-lg transition duration-300"
                             disabled={loading}
                         >
                             {loading ? 'Đang xác thực...' : 'Xác thực OTP'}
@@ -93,7 +93,7 @@ const VerifyOtpPage = () => {
                     <div className="text-center mt-4">
                         <Button
                             type="button"
-                            className="w-full bg-orange-500 hover:bg-orange-600 text-white py-2 rounded-lg transition duration-300 mt-2"
+                            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg transition duration-300 mt-2"
                             onClick={handleResendOtp}
                             disabled={loading}
                         >
@@ -101,7 +101,7 @@ const VerifyOtpPage = () => {
                         </Button>
                         <Link
                             to="/forgot-password"
-                            className="text-sm text-orange-600 hover:text-orange-800 block mt-2"
+                            className="text-sm text-blue-700 hover:text-blue-700 block mt-2"
                             onClick={() => dispatch(clearForgotPasswordEmail())}
                         >
                             Nhập lại email khác

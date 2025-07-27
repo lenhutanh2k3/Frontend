@@ -235,14 +235,8 @@ const OrderDetailPage = () => {
                order.paymentMethod === PAYMENT_METHOD.VNPAY;
     };
 
-    const handlePrintOrder = () => {
-        window.print();
-    };
-
-    const handleDownloadInvoice = () => {
-        // Implement download invoice functionality
-        toast.info('Tính năng tải hóa đơn sẽ được cập nhật sớm!');
-    };
+    // Xóa hàm handlePrintOrder
+    // Xóa hàm handleDownloadInvoice
 
     const handleShareOrder = () => {
         if (navigator.share) {
@@ -317,10 +311,11 @@ const OrderDetailPage = () => {
                         <span className={`ml-4 px-4 py-2 rounded-full text-base font-semibold ${getStatusColor(selectedOrder.orderStatus)}`}>{getStatusText(selectedOrder.orderStatus)}</span>
                         <span className={`ml-2 px-4 py-2 rounded-full text-base font-semibold ${getPaymentStatusColor(selectedOrder.paymentStatus)}`}>{selectedOrder.paymentStatus === PAYMENT_STATUS.PAID ? 'Đã thanh toán' : 'Chưa thanh toán'}</span>
                     </div>
-                    <div className="flex gap-2">
+                    {/* Xóa các nút in và tải hóa đơn */}
+                    {/* <div className="flex gap-2">
                         <Button onClick={handlePrintOrder} className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 flex items-center"><FaPrint className="mr-2" />In</Button>
                         <Button onClick={handleDownloadInvoice} className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center"><FaDownload className="mr-2" />Tải hóa đơn</Button>
-                    </div>
+                    </div> */}
                 </div>
                 <div className="text-gray-600 mb-6">Mã đơn hàng: <span className="font-semibold text-gray-900">#{selectedOrder.orderCode}</span> | Đặt lúc {formatDate(selectedOrder.createdAt)}</div>
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

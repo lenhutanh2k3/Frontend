@@ -66,7 +66,6 @@ export const deleteBook = createAsyncThunk(
     async (id, { rejectWithValue }) => {
         try {
             const response = await bookService.deleteBook(id);
-            toast.success(response.message || 'Xóa sách thành công!');
             return id;
         } catch (error) {
             const errorMessage = error.response?.data?.message || error.message || 'Không thể xóa sách.';

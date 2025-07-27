@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import Input from '../../components/common/Input'; // Đã chỉnh sửa Input
-import Button from '../../components/common/Button'; // Đã chỉnh sửa Button
+import Input from '../../components/common/Input'; 
+import Button from '../../components/common/Button';
 import { useDispatch, useSelector } from 'react-redux';
 import { register, clearError } from '../../features/auth/authSlice';
-import { toast } from 'react-toastify';
+
 
 const RegisterPage = () => {
   const [formData, setFormData] = useState({
@@ -19,7 +19,7 @@ const RegisterPage = () => {
   const { loading, error } = useSelector((state) => state.auth);
 
   useEffect(() => {
-    // Clear lỗi khi vào trang đăng ký
+
     dispatch(clearError());
     localStorage.removeItem('authError');
     sessionStorage.removeItem('authError');
@@ -40,6 +40,9 @@ const RegisterPage = () => {
       newErrors.password = 'Mật khẩu phải có ít nhất 8 ký tự';
     } else if (!/[A-Z]/.test(formData.password)) {
       newErrors.password = 'Mật khẩu phải chứa ít nhất 1 chữ cái viết hoa';
+    }
+    else if (!/[0-9]/.test(formData.password)) {
+      newErrors.password = 'Mật khẩu phải chứa ít nhất 1 chữ số';
     }
 
     if (!formData.repeat_password) {

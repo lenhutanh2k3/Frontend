@@ -14,30 +14,6 @@ export const createReview = createAsyncThunk(
     }
 );
 
-export const updateReview = createAsyncThunk(
-    'review/updateReview',
-    async ({ reviewId, reviewData }, { rejectWithValue }) => {
-        try {
-            const response = await userService.updateReview(reviewId, reviewData);
-            return response.data;
-        } catch (error) {
-            return rejectWithValue(error.response?.data || 'Có lỗi xảy ra');
-        }
-    }
-);
-
-export const deleteReview = createAsyncThunk(
-    'review/deleteReview',
-    async (reviewId, { rejectWithValue }) => {
-        try {
-            await userService.deleteReview(reviewId);
-            return reviewId;
-        } catch (error) {
-            return rejectWithValue(error.response?.data || 'Có lỗi xảy ra');
-        }
-    }
-);
-
 export const getUserReviewForBook = createAsyncThunk(
     'review/getUserReviewForBook',
     async ({ bookId, orderId }, { rejectWithValue }) => {
@@ -187,18 +163,7 @@ export const getHiddenReviews = createAsyncThunk(
     }
 );
 
-// Admin get review stats
-export const getReviewStats = createAsyncThunk(
-    'review/getReviewStats',
-    async (_, { rejectWithValue }) => {
-        try {
-            const response = await userService.getReviewStats();
-            return response.data;
-        } catch (error) {
-            return rejectWithValue(error.response?.data || 'Có lỗi xảy ra');
-        }
-    }
-);
+
 
 const initialState = {
     // User reviews
@@ -222,10 +187,6 @@ const initialState = {
     // Create/Update review
     createReviewLoading: false,
     createReviewError: null,
-    updateReviewLoading: false,
-    updateReviewError: null,
-    deleteReviewLoading: false,
-    deleteReviewError: null,
 
     // Helpful/Report
     markHelpfulLoading: false,
@@ -248,10 +209,7 @@ const initialState = {
     hiddenReviewsError: null,
     hiddenReviewsPagination: null,
 
-    // Review stats
-    reviewStats: null,
-    reviewStatsLoading: false,
-    reviewStatsError: null
+
 };
 
 const reviewSlice = createSlice({
@@ -260,8 +218,6 @@ const reviewSlice = createSlice({
     reducers: {
         clearReviewErrors: (state) => {
             state.createReviewError = null;
-            state.updateReviewError = null;
-            state.deleteReviewError = null;
             state.userReviewsError = null;
             state.bookReviewsError = null;
             state.currentUserReviewError = null;
@@ -288,45 +244,6 @@ const reviewSlice = createSlice({
             .addCase(createReview.rejected, (state, action) => {
                 state.createReviewLoading = false;
                 state.createReviewError = action.payload?.message || 'Có lỗi xảy ra';
-            });
-
-        // Update review
-        builder
-            .addCase(updateReview.pending, (state) => {
-                state.updateReviewLoading = true;
-                state.updateReviewError = null;
-            })
-            .addCase(updateReview.fulfilled, (state, action) => {
-                state.updateReviewLoading = false;
-                state.currentUserReview = action.payload.review;
-                // Update in user reviews list
-                const index = state.userReviews.findIndex(r => r._id === action.payload.review._id);
-                if (index !== -1) {
-                    state.userReviews[index] = action.payload.review;
-                }
-            })
-            .addCase(updateReview.rejected, (state, action) => {
-                state.updateReviewLoading = false;
-                state.updateReviewError = action.payload?.message || 'Có lỗi xảy ra';
-            });
-
-        // Delete review
-        builder
-            .addCase(deleteReview.pending, (state) => {
-                state.deleteReviewLoading = true;
-                state.deleteReviewError = null;
-            })
-            .addCase(deleteReview.fulfilled, (state, action) => {
-                state.deleteReviewLoading = false;
-                state.currentUserReview = null;
-                // Remove from user reviews list
-                state.userReviews = state.userReviews.filter(r => r._id !== action.payload);
-                // Remove from admin reviews list
-                state.adminReviews = state.adminReviews.filter(r => r._id !== action.payload);
-            })
-            .addCase(deleteReview.rejected, (state, action) => {
-                state.deleteReviewLoading = false;
-                state.deleteReviewError = action.payload?.message || 'Có lỗi xảy ra';
             });
 
         // Get user review for book
@@ -522,20 +439,7 @@ const reviewSlice = createSlice({
                 state.hiddenReviewsError = action.payload?.message || 'Có lỗi xảy ra';
             });
 
-        // Get review stats
-        builder
-            .addCase(getReviewStats.pending, (state) => {
-                state.reviewStatsLoading = true;
-                state.reviewStatsError = null;
-            })
-            .addCase(getReviewStats.fulfilled, (state, action) => {
-                state.reviewStatsLoading = false;
-                state.reviewStats = action.payload;
-            })
-            .addCase(getReviewStats.rejected, (state, action) => {
-                state.reviewStatsLoading = false;
-                state.reviewStatsError = action.payload?.message || 'Có lỗi xảy ra';
-            });
+
     }
 });
 

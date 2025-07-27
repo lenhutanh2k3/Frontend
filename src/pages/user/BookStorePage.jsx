@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { getAllBooks } from '../../features/book/bookSlice';
 import { getAllCategories } from '../../features/category/categorySlice';
 import { getAllAuthors } from '../../features/author/authorSlice'; // Giả định có slice cho tác giả
-import { getAllPublishers } from '../../features/publisher/publisherSlice'; // Giả định có slice cho nhà xuất bản
+import { getAllPublishers } from '../../features/publisher/publisherSlice'; 
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { FaSearch, FaFilter, FaTimes, FaSort, FaChevronDown } from 'react-icons/fa';
@@ -20,7 +20,7 @@ const BookStorePage = () => {
     const { isAuthenticated } = useSelector((state) => state.auth);
 
     // Quản lý trạng thái
-    const [searchQuery, setSearchQuery] = useState('');
+    const [searchInput, setSearchInput] = useState('');
     const [filters, setFilters] = useState({
         category: [],
         author: [],
@@ -31,8 +31,14 @@ const BookStorePage = () => {
     });
     const [currentPage, setCurrentPage] = useState(1);
     const [showFilters, setShowFilters] = useState(false);
+    // XÓA các state isInitialized, hasInitialFetch
+    // ... giữ lại searchInput, filters, currentPage ...
 
-    // Đọc tham số truy vấn từ URL
+    // Ref cho debounced search
+    const searchTimeoutRef = useRef(null);
+    const didMountRef = useRef(false);
+
+    // Khi location.search đổi, chỉ cập nhật searchInput (không set searchQuery)
     useEffect(() => {
         const params = new URLSearchParams(location.search);
         const query = params.get('q') || '';
@@ -40,7 +46,7 @@ const BookStorePage = () => {
         const author = params.get('author') ? params.get('author').split(',') : [];
         const publisher = params.get('publisher') ? params.get('publisher').split(',') : [];
 
-        setSearchQuery(query);
+        setSearchInput(query);
         setFilters((prev) => ({
             ...prev,
             category,
@@ -50,34 +56,16 @@ const BookStorePage = () => {
         setCurrentPage(1);
     }, [location.search]);
 
-    // Cập nhật URL khi bộ lọc thay đổi
-    useEffect(() => {
-        const params = new URLSearchParams();
-        if (searchQuery) params.set('q', searchQuery);
-        if (filters.category.length > 0) params.set('category', filters.category.join(','));
-        if (filters.author.length > 0) params.set('author', filters.author.join(','));
-        if (filters.publisher.length > 0) params.set('publisher', filters.publisher.join(','));
-        const newUrl = `/bookstore?${params.toString()}`;
-        navigate(newUrl, { replace: true });
-    }, [filters.category, filters.author, filters.publisher, searchQuery, navigate]);
-
-    // useEffect chỉ lấy categories, authors, publishers khi mount
-    useEffect(() => {
-        dispatch(getAllCategories());
-        dispatch(getAllAuthors());
-        dispatch(getAllPublishers());
-    }, [dispatch]);
-
-    // useEffect lấy sách khi filter/search/page thay đổi
+    // Khi location.search, filters, currentPage đổi, fetchBooks
     useEffect(() => {
         fetchBooks();
-        // eslint-disable-next-line
-    }, [currentPage, filters]);
+    }, [location.search, filters, currentPage]);
 
-    // Hàm fetchBooks không dùng useMemo nữa
-    const fetchBooks = () => {
-        const params = {
-            q: searchQuery || undefined,
+    const fetchBooks = useCallback(() => {
+        const params = new URLSearchParams(location.search);
+        const query = params.get('q') || '';
+        const fetchParams = {
+            q: query || undefined,
             category: filters.category.length > 0 ? filters.category.join(',') : undefined,
             author: filters.author.length > 0 ? filters.author.join(',') : undefined,
             publisher: filters.publisher.length > 0 ? filters.publisher.join(',') : undefined,
@@ -88,9 +76,9 @@ const BookStorePage = () => {
             page: currentPage,
             limit: 10,
         };
-        Object.keys(params).forEach((key) => params[key] === undefined && delete params[key]);
-        dispatch(getAllBooks(params));
-    };
+        Object.keys(fetchParams).forEach((key) => fetchParams[key] === undefined && delete fetchParams[key]);
+        dispatch(getAllBooks(fetchParams));
+    }, [location.search, filters, currentPage, dispatch]);
 
     // Xử lý lỗi
     useEffect(() => {
@@ -100,15 +88,23 @@ const BookStorePage = () => {
         }
     }, [error]);
 
+    // Debounced search function: XÓA hoặc bỏ dùng searchQuery
     // Xử lý tìm kiếm
     const handleSearchChange = (e) => {
-        setSearchQuery(e.target.value);
+        setSearchInput(e.target.value); // chỉ thay đổi input ở trang này
     };
 
     const handleSearchSubmit = (e) => {
         e.preventDefault();
+        // Khi submit, cập nhật URL với từ khóa tìm kiếm
+        const params = new URLSearchParams(location.search);
+        if (searchInput.trim()) {
+            params.set('q', searchInput.trim());
+        } else {
+            params.delete('q');
+        }
+        navigate({ pathname: '/bookstore', search: params.toString() ? `?${params.toString()}` : '' });
         setCurrentPage(1);
-        fetchBooks();
     };
 
     // Xử lý bộ lọc
@@ -143,15 +139,25 @@ const BookStorePage = () => {
     const handlePriceRangeChange = (type, value) => {
         // Không cho phép nhập số âm hoặc dấu -
         let sanitized = value.replace(/[^\d]/g, '');
-        if (sanitized === '') sanitized = '';
-        else sanitized = String(Math.max(0, parseInt(sanitized, 10)));
-        setFilters((prev) => ({
-            ...prev,
-            priceRange: {
-                ...prev.priceRange,
-                [type]: sanitized === '' ? '' : parseInt(sanitized, 10),
-            },
-        }));
+        if (sanitized === '') {
+            // Nếu rỗng, set về giá trị mặc định
+            setFilters((prev) => ({
+                ...prev,
+                priceRange: {
+                    ...prev.priceRange,
+                    [type]: type === 'min' ? 0 : Infinity,
+                },
+            }));
+        } else {
+            const numValue = Math.max(0, parseInt(sanitized, 10));
+            setFilters((prev) => ({
+                ...prev,
+                priceRange: {
+                    ...prev.priceRange,
+                    [type]: numValue,
+                },
+            }));
+        }
         setCurrentPage(1);
     };
 
@@ -164,7 +170,10 @@ const BookStorePage = () => {
             availability: [],
             sort: 'createdAt:desc',
         });
-        setSearchQuery('');
+        // Xóa từ khóa tìm kiếm bằng cách cập nhật URL
+        const params = new URLSearchParams(location.search);
+        params.delete('q');
+        navigate({ pathname: '/bookstore', search: params.toString() ? `?${params.toString()}` : '' });
         setCurrentPage(1);
     };
 
@@ -176,10 +185,10 @@ const BookStorePage = () => {
             filters.priceRange.min !== 0 ||
             filters.priceRange.max !== Infinity ||
             filters.availability.length > 0 ||
-            searchQuery ||
+            searchInput ||
             filters.sort !== 'createdAt:desc'
         );
-    }, [filters, searchQuery]);
+    }, [filters, searchInput]);
 
     // Thêm vào BookCard hoặc nơi có nút thêm vào giỏ hàng:
     // onClick={() => handleAddToCart(book)}
@@ -206,30 +215,25 @@ const BookStorePage = () => {
                         <div className="flex-1 relative">
                             <input
                                 type="text"
-                                placeholder="Tìm kiếm sách theo tên, tác giả, NXB..."
-                                value={searchQuery}
+                                placeholder="Tìm kiếm sách theo tên sách, tác giả, nhà xuất bản..."
+                                value={searchInput}
                                 onChange={handleSearchChange}
                                 className="w-full p-4 pl-12 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300"
                             />
                             <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                            {loading && (
+                                <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                                </div>
+                            )}
                         </div>
-                        {/* <button
-                            type="button"
-                            onClick={() => setShowFilters(!showFilters)}
+                        <button
+                            type="submit"
                             className="px-6 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 transition duration-300"
                         >
-                            <FaFilter />
-                            <span>Bộ lọc</span>
-                            {isFilterActive && (
-                                <span className="bg-white text-blue-600 text-xs px-2 py-1 rounded-full">
-                                    {filters.category.length +
-                                        filters.author.length +
-                                        filters.publisher.length +
-                                        (filters.availability.length ? 1 : 0) +
-                                        (filters.priceRange.min || filters.priceRange.max !== Infinity ? 1 : 0)}
-                                </span>
-                            )}
-                        </button> */}
+                            <FaSearch />
+                            <span>Tìm kiếm</span>
+                        </button>
                     </form>
                 </div>
 
@@ -431,7 +435,7 @@ const BookStorePage = () => {
                                 <input
                                     type="number"
                                     placeholder="Đến"
-                                    value={filters.priceRange.max === Infinity ? '' : filters.priceRange.max}
+                                    value={filters.priceRange.max === Infinity ? '' : (isFinite(filters.priceRange.max) ? filters.priceRange.max : '')}
                                     onChange={(e) => handlePriceRangeChange('max', e.target.value)}
                                     className="w-full p-3 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     min="0"
@@ -462,7 +466,14 @@ const BookStorePage = () => {
                     <main className="lg:col-span-3">
                         <div className="flex justify-between items-center mb-6">
                             <h2 className="text-2xl font-semibold text-gray-800">Danh sách sách</h2>
-                            <p className="text-gray-600">{pagination.totalItems} sách được tìm thấy</p>
+                            <div className="text-right">
+                                <p className="text-gray-600">{pagination.totalItems} sách được tìm thấy</p>
+                                {searchInput && (
+                                    <p className="text-sm text-gray-500">
+                                        Kết quả tìm kiếm cho: <span className="font-semibold">"{searchInput}"</span>
+                                    </p>
+                                )}
+                            </div>
                         </div>
 
                         {loading ? (
@@ -491,10 +502,16 @@ const BookStorePage = () => {
                                     >
                                         <div className="relative">
                                             <img
-                                                src={`${import.meta.env.VITE_BOOK_SERVICE}/${book.images[0]?.path || 'Uploads/default-image.jpg'}`}
+                                                src={book.images && book.images.length > 0 && book.images[0]?.path 
+                                                    ? `${import.meta.env.VITE_BOOK_SERVICE}/${book.images[0].path}`
+                                                    : '/placeholder-book.jpg'
+                                                }
                                                 alt={book.title}
-                                            loading="lazy" // Thêm thuộc tính này
+                                                loading="lazy"
                                                 className="w-full h-40 object-contain"
+                                                onError={(e) => {
+                                                    e.target.src = '/placeholder-book.jpg';
+                                                }}
                                             />
                                             {!book.availability && (
                                                 <div className="absolute top-2 right-2 bg-red-500 text-white px-3 py-1 text-xs rounded-full">
@@ -525,10 +542,35 @@ const BookStorePage = () => {
                             </div>
                         ) : (
                             <div className="text-center py-16">
-                                <p className="text-gray-600 text-lg">Không tìm thấy sách phù hợp.</p>
-                                <button onClick={resetFilters} className="mt-4 text-blue-600 hover:underline">
-                                    Xóa bộ lọc và thử lại
-                                </button>
+                                <div className="mb-4">
+                                    <FaSearch className="mx-auto text-gray-400 text-6xl mb-4" />
+                                    <p className="text-gray-600 text-lg mb-2">
+                                        {searchInput ? `Không tìm thấy sách phù hợp với từ khóa "${searchInput}"` : 'Không tìm thấy sách phù hợp.'}
+                                    </p>
+                                    <p className="text-gray-500 text-sm">
+                                        Thử tìm kiếm với từ khóa khác hoặc xóa bộ lọc để xem tất cả sách.
+                                    </p>
+                                </div>
+                                <div className="flex gap-4 justify-center">
+                                    <button 
+                                        onClick={() => {
+                                            // Xóa từ khóa tìm kiếm bằng cách cập nhật URL
+                                            const params = new URLSearchParams(location.search);
+                                            params.delete('q');
+                                            navigate({ pathname: '/bookstore', search: params.toString() ? `?${params.toString()}` : '' });
+                                            setCurrentPage(1);
+                                        }} 
+                                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300"
+                                    >
+                                        Xóa từ khóa tìm kiếm
+                                    </button>
+                                    <button 
+                                        onClick={resetFilters} 
+                                        className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition duration-300"
+                                    >
+                                        Xóa tất cả bộ lọc
+                                    </button>
+                                </div>
                             </div>
                         )}
 

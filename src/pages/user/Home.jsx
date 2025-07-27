@@ -14,7 +14,6 @@ const Home = () => {
   const { books, loading: booksLoading } = useSelector(state => state.book);
   const { categories, loading: categoriesLoading } = useSelector(state => state.category);
 
-  console.log(books);
   const [featuredBooks, setFeaturedBooks] = useState([]);
   const [newBooks, setNewBooks] = useState([]);
   const [bestsellers, setBestsellers] = useState([]);
@@ -22,7 +21,6 @@ const Home = () => {
   const [recommendedBooks, setRecommendedBooks] = useState([]);
 
   const { isAuthenticated } = useSelector(state => state.auth);
-  console.log("books",books);
   useEffect(() => {
     dispatch(getAllBooks({ limit: 50 })); // Tăng limit để có nhiều sách hơn
     dispatch(getAllCategories());
@@ -31,13 +29,6 @@ const Home = () => {
 
   useEffect(() => {
     if (books.length > 0) {
-      // Sách nổi bật - rating cao và có nhiều review
-      setFeaturedBooks(
-        [...books]
-          .filter(book => book.rating >= 4.0 && book.reviewCount >= 5)
-          .sort((a, b) => (b.rating * b.reviewCount) - (a.rating * a.reviewCount))
-          .slice(0, 8)
-      );
 
       // Sách mới - sắp xếp theo createdAt
       setNewBooks(
@@ -51,7 +42,7 @@ const Home = () => {
         [...books]
           .filter(book => book.salesCount > 0)
           .sort((a, b) => b.salesCount - a.salesCount)
-          .slice(0, 10)
+          .slice(0,8)
       );
 
       // Sách khuyến mãi - tạm thời bỏ qua
@@ -173,11 +164,11 @@ const Home = () => {
     
     return (
       <Link to={`/bookstore?category=${category._id}`}>
-        <Card className="text-center hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer group">
-          <div className={`w-16 h-16 mx-auto mb-4 bg-gradient-to-br ${colorClass} rounded-full flex items-center justify-center transform group-hover:rotate-12 group-hover:scale-110 transition-all duration-300 shadow-lg`}>
+        <Card className="text-center flex flex-col items-center justify-center min-w-[220px] max-w-[220px] h-[220px] hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer group">
+          <div className={`w-16 h-16 mb-4 bg-gradient-to-br ${colorClass} rounded-full flex items-center justify-center transform group-hover:rotate-12 group-hover:scale-110 transition-all duration-300 shadow-lg`}>
             <FaBook className="text-white text-2xl" />
           </div>
-          <h5 className="font-semibold text-gray-900 mb-2 text-base group-hover:text-blue-600 transition-colors">{category.name}</h5>
+          <h5 className="font-semibold text-gray-900 mb-2 text-base group-hover:text-blue-600 transition-colors break-words w-full px-2">{category.name}</h5>
         </Card>
       </Link>
     );
@@ -265,9 +256,11 @@ const Home = () => {
               Khám phá các thể loại sách đa dạng, từ văn học, kinh tế đến khoa học công nghệ
             </p>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 md:gap-6">
+          <div className="flex flex-wrap justify-center gap-4 md:gap-6">
             {categories.slice(0, 12).map((category, index) => (
-              <CategoryCard key={category._id} category={category} index={index} />
+              <div key={category._id} className="flex-shrink-0 min-w-[220px] max-w-[220px] h-[220px] flex items-center justify-center">
+                <CategoryCard category={category} index={index} />
+              </div>
             ))}
           </div>
         </div>
@@ -312,7 +305,7 @@ const Home = () => {
           <div className="flex flex-col md:flex-row items-center justify-between mb-6 md:mb-8 gap-2 md:gap-0">
             <div className="flex items-center gap-3">
               <FaTrophy className="text-3xl text-red-500" />
-              <h2 className="text-xl md:text-3xl font-extrabold text-gray-900">Sách bán chạy</h2>
+              <h2 className="text-xl md:text-3xl font-extrabold text-gray-900">Top 8 Sách bán chạy</h2>
             </div>
             <Link to="/bookstore?sort=bestseller" className="text-red-600 hover:text-red-800 font-semibold flex items-center transition-colors">
               Xem tất cả <FaArrowRight className="ml-2" />

@@ -9,8 +9,7 @@ import NavbarUser from '../../components/common/NavbarUser';
 const ProfilePage = () => {
   const dispatch = useDispatch();
   const { user: authUser } = useSelector((state) => state.auth); 
-  const { profile, loading: profileLoading, error: profileError } = useSelector((state) => state.profile); // Lấy profile và error từ profileSlice
-  console.log(authUser);
+  const { profile, loading: profileLoading, error: profileError } = useSelector((state) => state.profile);
   const [profileData, setProfileData] = useState({
     fullName: '',
     email: '',
@@ -198,7 +197,7 @@ const ProfilePage = () => {
 
                 <label
                   htmlFor="file-upload"
-                  className="cursor-pointer bg-orange-500 text-white py-2 px-6 rounded-full font-semibold hover:bg-orange-600 transition duration-300 ease-in-out shadow-md hover:shadow-lg mt-4"
+                  className="cursor-pointer bg-blue-600 text-white py-2 px-6 rounded-full font-semibold hover:bg-blue-700 transition duration-300 ease-in-out shadow-md hover:shadow-lg mt-4"
                 >
                   Chọn ảnh mới
                   <input

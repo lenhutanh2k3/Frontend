@@ -22,13 +22,7 @@ const BookDetailPage = () => {
     const [quantity, setQuantity] = useState(1);
     const [showFullDescription, setShowFullDescription] = useState(false);
 
-    const defaultShippingAddress = "Phường Bến Nghé, Quận 1, Hồ Chí Minh";
-    const offers = [
-        { id: 1, text: "Mã giảm 10k", color: "green" },
-        { id: 2, text: "Mã giảm 15k", color: "green" },
-        { id: 3, text: "Mã giảm 10k", color: "green" },
-        { id: 4, text: "Vpbank giảm 50k", color: "blue" },
-    ];
+   
 
     useEffect(() => {
         dispatch(getBookById(id));

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { useNavigate, Link } from 'react-router-dom';
-import { confirmChangePassword } from '../../features/auth/authSlice';
+import { confirmChangePassword, resendChangePasswordOtp } from '../../features/auth/authSlice';
 
 import Input from '../../components/common/Input';
 import Button from '../../components/common/Button';
@@ -34,6 +34,14 @@ const VerifyChangePasswordOtpPage = () => {
         }
     };
 
+    const handleResendOtp = async () => {
+        try {
+            await dispatch(resendChangePasswordOtp()).unwrap();
+        } catch (err) {
+            // Error toast đã được xử lý trong thunk
+        }
+    };
+
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
             <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-lg shadow-md">
@@ -56,21 +64,32 @@ const VerifyChangePasswordOtpPage = () => {
                         maxLength={6}
                     />
                     <div>
+
                         <Button
                             type="submit"
-                            className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-lg transition duration-300"
+                            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg transition duration-300"
                             disabled={loading}
                         >
                             {loading ? 'Đang xác thực...' : 'Xác thực OTP'}
                         </Button>
                     </div>
+                    <div className="text-center mb-2 w-full">
+                        <Button
+                            type="button"
+                            className="bg-blue-600 hover:bg-blue-700 text-white rounded transition duration-300"
+                            onClick={handleResendOtp}
+                            disabled={loading}
+                        >
+                            {loading ? 'Đang gửi lại...' : 'Gửi lại mã OTP'}
+                        </Button>
+                    </div>
                     {error && <p className="text-red-500 text-sm text-center mt-4">{error}</p>}
-                    <div className="text-center">
+                    <div className="text-center w-full">
                         <Link
                             to="/change-password"
-                            className="text-sm text-orange-600 hover:text-orange-800"
+                            className="text-sm text-blue-600 hover:text-blue-800"
                         >
-                            Yêu cầu lại mã OTP
+                            Trở lại trang đổi mật khẩu
                         </Link>
                     </div>
                 </form>

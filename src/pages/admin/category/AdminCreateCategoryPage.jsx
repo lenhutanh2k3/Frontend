@@ -71,16 +71,17 @@ const AdminCreateCategoryPage = () => {
                             />
                         </div>
                         <div>
-                            <Input
-                                label="Mô tả"
+                            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                                <FaAlignLeft className="mr-2" /> Mô tả
+                            </label>
+                            <textarea
                                 id="description"
-                                type="text"
                                 name="description"
                                 required
                                 value={formData.description}
                                 onChange={handleChange}
                                 placeholder="Nhập mô tả danh mục"
-                                icon={FaAlignLeft}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 min-h-[80px]"
                             />
                         </div>
 

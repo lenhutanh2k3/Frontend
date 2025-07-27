@@ -31,7 +31,7 @@ const user_service = {
         try {
             const service = await getUserService();
             const response = await service.post('/api/users/logout');
-    
+
             return response.data;
         } catch (error) {
             throw error;
@@ -79,6 +79,15 @@ const user_service = {
         try {
             const service = await getUserService();
             const response = await service.post('/api/users/change-password/confirm', { otp });
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    },
+    resendChangePasswordOtp: async () => {
+        try {
+            const service = await getUserService();
+            const response = await service.post('/api/users/change-password/resend-otp');
             return response.data;
         } catch (error) {
             throw error;
@@ -403,16 +412,7 @@ const user_service = {
         }
     },
 
-    // Admin get review stats
-    getReviewStats: async () => {
-        try {
-            const service = await getUserService();
-            const response = await service.get('/api/reviews/admin/stats');
-            return response.data;
-        } catch (error) {
-            throw error;
-        }
-    },
+
 
 
     // ==== BÁO CÁO/THỐNG KÊ ADMIN ====

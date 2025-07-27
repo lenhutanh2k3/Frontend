@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { createReview, updateReview, clearReviewErrors } from '../../features/review/reviewSlice';
+import { createReview} from '../../features/review/reviewSlice';
 import Button from './Button';
 import { toast } from 'react-toastify';
 
@@ -133,6 +133,8 @@ const ReviewForm = ({
                 {existingReview ? 'Chỉnh sửa đánh giá' : 'Viết đánh giá'}
             </h3>
             
+            {/* Xóa phần lưu ý */}
+            {/*
             {!existingReview && (
                 <div className="bg-blue-50 border border-blue-200 rounded-md p-3 mb-4">
                     <p className="text-sm text-blue-800">
@@ -140,6 +142,7 @@ const ReviewForm = ({
                     </p>
                 </div>
             )}
+            */}
 
             <form onSubmit={handleSubmit} className="space-y-4">
                 {/* Rating */}

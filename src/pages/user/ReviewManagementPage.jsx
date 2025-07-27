@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getUserReviews, deleteReview } from '../../features/review/reviewSlice';
+import { getUserReviews } from '../../features/review/reviewSlice';
 import ReviewCard from '../../components/common/ReviewCard';
-import ReviewForm from '../../components/common/ReviewForm';
 import Button from '../../components/common/Button';
-import { toast } from 'react-toastify';
 
 const ReviewManagementPage = () => {
     const dispatch = useDispatch();
@@ -13,7 +11,6 @@ const ReviewManagementPage = () => {
         userReviewsLoading, 
         userReviewsError,
         userReviewsPagination,
-        deleteReviewLoading
     } = useSelector(state => state.review);
 
     const [showReviewForm, setShowReviewForm] = useState(false);
@@ -24,30 +21,7 @@ const ReviewManagementPage = () => {
         dispatch(getUserReviews({ page: currentPage, limit: 10 }));
     }, [dispatch, currentPage]);
 
-    const handleEditReview = (review) => {
-        setEditingReview(review);
-        setShowReviewForm(true);
-    };
-
-    const handleDeleteReview = async (review) => {
-        if (window.confirm('Bạn có chắc chắn muốn xóa đánh giá này?')) {
-            try {
-                await dispatch(deleteReview(review._id)).unwrap();
-                toast.success('Xóa đánh giá thành công');
-                // Refresh reviews
-                dispatch(getUserReviews({ page: currentPage, limit: 10 }));
-            } catch (error) {
-                toast.error('Có lỗi xảy ra khi xóa đánh giá');
-            }
-        }
-    };
-
-    const handleReviewSuccess = () => {
-        setShowReviewForm(false);
-        setEditingReview(null);
-        // Refresh reviews
-        dispatch(getUserReviews({ page: currentPage, limit: 10 }));
-    };
+    // Remove handleEditReview, handleDeleteReview, handleReviewSuccess, and any edit/delete buttons or props
 
     const handlePageChange = (page) => {
         setCurrentPage(page);
@@ -106,7 +80,7 @@ const ReviewManagementPage = () => {
                                 bookId={editingReview?.bookId}
                                 orderId={editingReview?.orderId}
                                 existingReview={editingReview}
-                                onSuccess={handleReviewSuccess}
+                                onSuccess={() => {}} // No success handler for viewing
                                 onCancel={() => setShowReviewForm(false)}
                             />
                         </div>
@@ -153,9 +127,7 @@ const ReviewManagementPage = () => {
                                 )}
                                 <ReviewCard
                                     review={review}
-                                    showActions={true}
-                                    onEdit={handleEditReview}
-                                    onDelete={handleDeleteReview}
+                                    showActions={false} // No actions for viewing
                                 />
                             </div>
                         ))}

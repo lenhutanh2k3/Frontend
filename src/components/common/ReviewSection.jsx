@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { 
     getBookReviews, 
     getUserReviewForBook, 
-    deleteReview,
     clearBookReviews,
     clearCurrentUserReview 
 } from '../../features/review/reviewSlice';
@@ -11,7 +10,6 @@ import ReviewForm from './ReviewForm';
 import ReviewCard from './ReviewCard';
 import Button from './Button';
 import Select from './Select';
-import { toast } from 'react-toastify';
 
 const ReviewSection = ({ bookId, orderId, bookRating, refetchBook }) => {
     const dispatch = useDispatch();
@@ -23,7 +21,6 @@ const ReviewSection = ({ bookId, orderId, bookRating, refetchBook }) => {
         bookRatingStats,
         currentUserReview,
         currentUserReviewLoading,
-        deleteReviewLoading
     } = useSelector(state => state.review);
     const { user } = useSelector(state => state.auth);
 
@@ -59,22 +56,6 @@ const ReviewSection = ({ bookId, orderId, bookRating, refetchBook }) => {
         setShowReviewForm(true);
     };
 
-    const handleEditReview = (review) => {
-        setEditingReview(review);
-        setShowReviewForm(true);
-    };
-
-    const handleDeleteReview = async (review) => {
-        if (window.confirm('Bạn có chắc chắn muốn xóa đánh giá này?')) {
-            try {
-                await dispatch(deleteReview(review._id)).unwrap();
-                toast.success('Xóa đánh giá thành công');
-            } catch (error) {
-                toast.error('Có lỗi xảy ra khi xóa đánh giá');
-            }
-        }
-    };
-
     const handleReviewSuccess = () => {
         setShowReviewForm(false);
         setEditingReview(null);
@@ -102,11 +83,8 @@ const ReviewSection = ({ bookId, orderId, bookRating, refetchBook }) => {
     };
 
     const renderRatingStats = () => {
-        if (!bookRatingStats) return null;
-
-        const totalReviews = Object.values(bookRatingStats).reduce((sum, count) => sum + count, 0);
-        if (totalReviews === 0) return null;
-
+        if (!bookRating) return null;
+        // Lấy trực tiếp từ bookRating thay vì tính lại từ bookRatingStats
         return (
             <div className="bg-gray-50 rounded-lg p-4 mb-6">
                 <h4 className="font-semibold text-gray-900 mb-3">Thống kê đánh giá</h4>
@@ -114,20 +92,21 @@ const ReviewSection = ({ bookId, orderId, bookRating, refetchBook }) => {
                     <div className="flex items-center space-x-4">
                         <div className="text-center">
                             <div className="text-2xl font-bold text-blue-600">
-                                {bookRating?.averageRating?.toFixed(1) || '0.0'}
+                                {bookRating?.rating?.toFixed(1) || '0.0'}
                             </div>
                             <div className="text-sm text-gray-600">Trung bình</div>
                         </div>
                         <div className="text-center">
                             <div className="text-2xl font-bold text-gray-900">
-                                {totalReviews}
+                                {bookRating?.reviewCount || 0}
                             </div>
                             <div className="text-sm text-gray-600">Đánh giá</div>
                         </div>
                     </div>
                     <div className="space-y-1">
                         {[5, 4, 3, 2, 1].map(rating => {
-                            const count = bookRatingStats[rating] || 0;
+                            const count = bookRatingStats ? (bookRatingStats[rating] || 0) : 0;
+                            const totalReviews = bookRating?.reviewCount || 0;
                             const percentage = totalReviews > 0 ? (count / totalReviews) * 100 : 0;
                             return (
                                 <div key={rating} className="flex items-center space-x-2">
@@ -233,12 +212,11 @@ const ReviewSection = ({ bookId, orderId, bookRating, refetchBook }) => {
                 <h3 className="text-xl font-semibold text-gray-900">
                     Đánh giá từ khách hàng
                 </h3>
-                {user && orderId && currentUserReview && (
+                {currentUserReview && (
                     <div className="flex items-center space-x-2">
                         <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => handleEditReview(currentUserReview)}
                         >
                             Chỉnh sửa đánh giá
                         </Button>
@@ -304,8 +282,6 @@ const ReviewSection = ({ bookId, orderId, bookRating, refetchBook }) => {
                         <ReviewCard
                             key={review._id}
                             review={review}
-                            onEdit={handleEditReview}
-                            onDelete={handleDeleteReview}
                         />
                     ))}
                 </div>

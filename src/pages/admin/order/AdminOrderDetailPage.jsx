@@ -107,7 +107,7 @@ const AdminOrderDetailPage = () => {
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         {/* Cột trái: Thông tin khách + Sản phẩm */}
-                        <div className="md:col-span-2 space-y-6">
+                        <div className="md:col-span-2 space-y-5">
                             <div className="bg-gray-50 p-4 rounded-lg">
                                 <h2 className="text-lg font-semibold text-gray-700 mb-2">Thông Tin Khách Hàng</h2>
                                 <p><strong>Tên:</strong> {selectedOrder.fullName}</p>
@@ -151,7 +151,7 @@ const AdminOrderDetailPage = () => {
                             </div>
                         </div>
                         {/* Cột phải: Tổng kết + Trạng thái + Thao tác */}
-                        <div className="space-y-6">
+                        <div className="space-y-5">
                             <div className="bg-indigo-50 p-4 rounded-lg shadow">
                                 <h2 className="text-lg font-semibold text-indigo-700 mb-4">Tổng Kết Đơn Hàng</h2>
                                 <div className="flex justify-between mb-2">
@@ -163,7 +163,7 @@ const AdminOrderDetailPage = () => {
                                     <span className="font-semibold">{shippingFee.toLocaleString()} VNĐ</span>
                                 </div>
                                 <hr className="my-2 border-indigo-200" />
-                                <div className="flex justify-between text-xl font-bold">
+                                <div className="flex justify-between text-lg font-bold">
                                     <span>Tổng thanh toán:</span>
                                     <span className="text-indigo-700">{finalTotal.toLocaleString()} VNĐ</span>
                                 </div>

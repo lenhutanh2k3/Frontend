@@ -41,14 +41,15 @@ export const login = createAsyncThunk(
 
 export const logout = createAsyncThunk(
     'auth/logout',
-    async (_, { rejectWithValue, dispatch }) => { 
+    async (_, { rejectWithValue, dispatch }) => {
         try {
             const response = await userService.logout();
             dispatch(resetCartState());
-            localStorage.removeItem('token');         
+            localStorage.removeItem('token');
+
             return null;
         } catch (error) {
-            localStorage.removeItem('token'); 
+            localStorage.removeItem('token');
             const errorMessage = error.response?.data?.message || 'Đăng xuất thất bại';
             toast.error(errorMessage);
             return rejectWithValue(errorMessage);
@@ -125,6 +126,21 @@ export const confirmChangePassword = createAsyncThunk(
             return response;
         } catch (error) {
             const errorMessage = error.response?.data?.message || 'Đổi mật khẩu thất bại.';
+            toast.error(errorMessage);
+            return rejectWithValue(errorMessage);
+        }
+    }
+);
+
+export const resendChangePasswordOtp = createAsyncThunk(
+    'auth/resendChangePasswordOtp',
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await userService.resendChangePasswordOtp();
+            toast.success(response.message || 'Mã OTP mới đã được gửi đến email của bạn.');
+            return response;
+        } catch (error) {
+            const errorMessage = error.response?.data?.message || 'Gửi lại mã OTP thất bại.';
             toast.error(errorMessage);
             return rejectWithValue(errorMessage);
         }
@@ -277,6 +293,17 @@ const authSlice = createSlice({
                 state.accessToken = null;
             })
             .addCase(confirmChangePassword.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+            .addCase(resendChangePasswordOtp.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(resendChangePasswordOtp.fulfilled, (state) => {
+                state.loading = false;
+            })
+            .addCase(resendChangePasswordOtp.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             });

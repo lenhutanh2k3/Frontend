@@ -3,12 +3,13 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { FaBell, FaShoppingCart, FaUserCircle, FaBars, FaSignOutAlt, FaSearch, FaTimes, FaAngleDown, FaSpinner, FaBook, FaHome, FaHeart, FaUser, FaStar, FaClipboardList, FaTag } from 'react-icons/fa';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../../features/auth/authSlice';
-
+import { toast } from 'react-toastify';
 import { clearCart } from '../../features/cart/cartSlice';
 import { getAllCategories } from '../../features/category/categorySlice';
 import { getCart } from '../../features/cart/cartSlice';
 import Button from './Button';
 import Input from './Input';
+
 
 const Header = () => {
     const dispatch = useDispatch();
@@ -25,13 +26,15 @@ const Header = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isCategoryMenuOpen, setIsCategoryMenuOpen] = useState(false);
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-    const [searchQuery, setSearchQuery] = useState(''); // Thêm state cho ô tìm kiếm
+    const [searchQuery, setSearchQuery] = useState(''); // Giá trị thực sự dùng để submit
+    const [searchInput, setSearchInput] = useState(''); // Giá trị input riêng cho header
     const [isScrolled, setIsScrolled] = useState(false);
 
     // Ref cho việc đóng menu khi click ra ngoài
     const userMenuRef = useRef(null);
     const mobileMenuRef = useRef(null);
     const categoryButtonRef = useRef(null); // Ref cho nút "Tất cả danh mục"
+    const didMountRef = useRef(false);
 
     // Fetch categories khi component mount
     useEffect(() => {
@@ -104,6 +107,7 @@ const Header = () => {
     const handleLogout = useCallback(async () => {
         try {
             await dispatch(logout()).unwrap();
+            toast.info('Đăng xuất thành công');
             navigate('/');
         } catch (error) {
             console.error('Logout error:', error);
@@ -112,13 +116,38 @@ const Header = () => {
         setIsUserMenuOpen(false);
     }, [dispatch, navigate, closeMobileMenu]);
 
+    // Khi location.search thay đổi (tức là chuyển trang hoặc tìm kiếm mới), chỉ đồng bộ input header một lần
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const query = params.get('q') || '';
+        setSearchQuery(query);
+        if (!didMountRef.current) {
+            setSearchInput(query); // chỉ đồng bộ khi mount lần đầu
+            didMountRef.current = true;
+        }
+    }, [location.search]);
+
+    // Khi gõ ở header, chỉ thay đổi input ở header
+    const handleHeaderInputChange = (e) => {
+        setSearchInput(e.target.value);
+    };
+
+    // Khi submit ở header, chỉ cập nhật searchQuery và điều hướng
     const handleSearchSubmit = (e) => {
         e.preventDefault();
-        if (searchQuery.trim()) {
-            navigate(`/bookstore?q=${encodeURIComponent(searchQuery.trim())}`);
-            closeMobileMenu(); // Đóng menu mobile sau khi tìm kiếm
+        if (searchInput.trim()) {
+            navigate(`/bookstore?q=${encodeURIComponent(searchInput.trim())}`);
+            setSearchInput(''); // Xóa input header sau khi điều hướng
+            closeMobileMenu();
         }
     };
+
+    // Nếu đang ở trang /bookstore, khi input thay đổi cũng xóa input header
+    useEffect(() => {
+        if (location.pathname.startsWith('/bookstore')) {
+            setSearchInput('');
+        }
+    }, [location.pathname]);
 
     // Lấy URL ảnh profile
     const profilePictureUrl = user?.profilePicture
@@ -186,8 +215,8 @@ const Header = () => {
                             <Input
                                 type="text"
                                 placeholder="Tìm kiếm sách..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
+                                value={searchInput}
+                                onChange={handleHeaderInputChange}
                                 icon={<FaSearch />}
                                 className="w-full"
                             />
@@ -342,12 +371,12 @@ const Header = () => {
                         <Input
                             type="text"
                             placeholder="Tìm kiếm sách..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
+                            value={searchInput}
+                            onChange={handleHeaderInputChange}
                             icon={<FaSearch />}
                             className="w-full"
                             clearable={true}
-                            onClear={() => setSearchQuery('')}
+                            onClear={() => setSearchInput('')}
                         />
                     </form>
                 </div>

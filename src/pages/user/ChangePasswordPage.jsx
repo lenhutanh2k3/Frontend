@@ -32,6 +32,9 @@ const ChangePasswordPage = () => {
         } else if (!/[A-Z]/.test(newPassword)) {
             newErrors.newPassword = 'Mật khẩu mới phải chứa ít nhất 1 chữ hoa.';
         }
+        if (!/[0-9]/.test(newPassword)) {
+            newErrors.newPassword = 'Mật khẩu mới phải chứa ít nhất 1 chữ số.';
+        }
         if (!confirmNewPassword) {
             newErrors.confirmNewPassword = 'Vui lòng xác nhận mật khẩu mới.';
         } else if (newPassword !== confirmNewPassword) {

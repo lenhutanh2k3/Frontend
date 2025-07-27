@@ -45,6 +45,10 @@ const ConfirmResetPasswordPage = () => {
       toast.error('Mật khẩu mới và xác nhận mật khẩu không khớp.');
       return;
     }
+    if (!/[0-9]/.test(newPassword)) {
+      toast.error('Mật khẩu mới phải chứa ít nhất 1 chữ số.');
+      return;
+    }
     console.log({
       email: emailFromVerify,
       passwordChangeToken,
@@ -102,7 +106,7 @@ const ConfirmResetPasswordPage = () => {
           <div>
             <Button
               type="submit"
-              className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-lg transition duration-300"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg transition duration-300"
               disabled={loading}
             >
               {loading ? 'Đang đặt lại...' : 'Đặt Lại Mật Khẩu'}
@@ -112,7 +116,7 @@ const ConfirmResetPasswordPage = () => {
           <div className="text-center mt-4">
             <Link
               to="/forgot-password"
-              className="text-sm text-orange-600 hover:text-orange-800"
+              className="text-sm text-blue-600 hover:text-blue-700"
               onClick={() => dispatch(clearForgotPasswordEmail())}
             >
               Bắt đầu lại quy trình quên mật khẩu

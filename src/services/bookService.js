@@ -85,17 +85,6 @@ const book_service = {
             throw error;
         }
     },
-    getDeletedBooks: async (params = {}) => {
-        try {
-            const service = await getBookService();
-            const queryString = new URLSearchParams(params).toString();
-            // Backend: GET /api/books/deleted
-            const response = await service.get(`/api/books/deleted?${queryString}`);
-            return response.data; // Trả về { success, message, data: { books, pagination } }
-        } catch (error) {
-            throw error;
-        }
-    },
 
     // Category Service API
     getAllCategories: async (params = {}) => {

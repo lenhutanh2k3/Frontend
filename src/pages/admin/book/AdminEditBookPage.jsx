@@ -121,10 +121,7 @@ const AdminEditBookPage = () => {
         if (formData.keepExistingImages === 'true') {
             totalImagesAfterUpdate = existingImageDetails.map(img => img._id); // Lấy ID của ảnh cũ còn lại
         }
-        if (newSelectedFiles.length > 0) {
-            // Không thể thêm File objects trực tiếp vào totalImagesAfterUpdate vì chúng không phải ID
-            // Việc thêm ảnh mới sẽ được xử lý bằng FormData
-        }
+      
 
         if (totalImagesAfterUpdate.length === 0 && newSelectedFiles.length === 0) {
             toast.error('Vui lòng cung cấp ít nhất một ảnh cho sách.');
@@ -237,6 +234,7 @@ const AdminEditBookPage = () => {
                                     min="0.01"
                                     step="0.01"
                                     icon={FaDollarSign}
+                                    
                                 />
                             </div>
                             <div>
@@ -251,6 +249,7 @@ const AdminEditBookPage = () => {
                                     required
                                     min="0"
                                     icon={FaBoxes}
+                                    disabled={true}
                                 />
                             </div>
                             <div>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { FaTachometerAlt, FaUsers, FaBook, FaSignOutAlt, FaGift, FaStar, FaChartBar } from 'react-icons/fa';
+import { FaTachometerAlt, FaUsers, FaBook, FaSignOutAlt, FaGift, FaStar } from 'react-icons/fa';
 
 const AdminSidebar = () => {
   return (

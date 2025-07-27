@@ -60,7 +60,7 @@ const ForgotPasswordPage = () => {
           <div>
             <Button
               type="submit"
-              className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-lg transition duration-300"
+              className="w-full bg-blue-600  text-white py-3 rounded-lg transition duration-300"
               disabled={loading}
             >
               {loading ? 'Đang gửi...' : 'Gửi Yêu Cầu Đặt Lại Mật Khẩu'}
@@ -69,7 +69,7 @@ const ForgotPasswordPage = () => {
           <div className="text-center">
             <Link
               to="/login"
-              className="text-sm text-orange-600 hover:text-orange-800"
+              className="text-sm text-blue-600 hover:text-blue-800"
             >
               Quay lại Đăng nhập
             </Link>

@@ -21,7 +21,6 @@ const AdminBooksPage = () => {
     const { categories } = useSelector((state) => state.category);
     const { authors } = useSelector((state) => state.author);
     const { publishers } = useSelector((state) => state.publisher);
-    // console.log("Current pagination state:", pagination); // Để debug pagination
 
     const [currentPage, setCurrentPage] = useState(pagination.currentPage || 1);
     const [searchTerm, setSearchTerm] = useState('');
@@ -137,8 +136,8 @@ const AdminBooksPage = () => {
     };
     const handleUpdateStock = async () => {
         setStockError('');
-        if (!stockInput || isNaN(stockInput)) {
-            setStockError('Vui lòng nhập số lượng hợp lệ!');
+        if (!stockInput || isNaN(stockInput) || Number(stockInput) <= 0) {
+            setStockError('Vui lòng nhập số lượng hợp lệ (lớn hơn 0)!');
             return;
         }
         setStockLoading(true);
@@ -488,7 +487,7 @@ const AdminBooksPage = () => {
                             <input
                                 type="number"
                                 className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder="Nhập số lượng muốn tăng (+) hoặc giảm (-)"
+                                placeholder="Nhập số lượng"
                                 value={stockInput}
                                 onChange={e => setStockInput(e.target.value)}
                                 disabled={stockLoading}
