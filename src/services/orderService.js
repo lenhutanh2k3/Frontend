@@ -123,10 +123,10 @@ const order_service = {
             throw error;
         }
     },
-    retryPayment: async (orderId) => {
+    retryPayment: async (orderId, confirmCancel) => {
         try {
             const service = await getOrderService();
-            const response = await service.post(`/api/order/${orderId}/retry-payment`);
+            const response = await service.post(`/api/order/${orderId}/retry-payment`, confirmCancel !== undefined ? { confirmCancel } : {});
             return response.data; // { success, message, data: { order } }
         } catch (error) {
             throw error;

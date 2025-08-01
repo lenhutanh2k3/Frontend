@@ -104,7 +104,7 @@ const OrderDetailPage = () => {
     const handleRetryPayment = async () => {
         setIsLoading(true);
         try {
-            const result = await dispatch(retryPayment(id)).unwrap();
+            const result = await dispatch(retryPayment({ orderId: id })).unwrap();
             if (result.vnpUrl) {
                 setRetryCount(0);
                 window.location.href = result.vnpUrl;

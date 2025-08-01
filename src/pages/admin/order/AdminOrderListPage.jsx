@@ -12,7 +12,9 @@ const AdminOrderListPage = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
+    console.log("orders",orders);
     useEffect(() => {
+        console.log("Fetching orders with params:", { page: currentPage, limit: 10, status: statusFilter, search: searchQuery });
         dispatch(getAllOrders({ page: currentPage, limit: 10, status: statusFilter, search: searchQuery }));
     }, [dispatch, currentPage, statusFilter, searchQuery]);
 

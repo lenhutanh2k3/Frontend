@@ -14,6 +14,7 @@ const Home = () => {
   const { books, loading: booksLoading } = useSelector(state => state.book);
   const { categories, loading: categoriesLoading } = useSelector(state => state.category);
 
+  console.log(books);
   const [featuredBooks, setFeaturedBooks] = useState([]);
   const [newBooks, setNewBooks] = useState([]);
   const [bestsellers, setBestsellers] = useState([]);
@@ -21,6 +22,7 @@ const Home = () => {
   const [recommendedBooks, setRecommendedBooks] = useState([]);
 
   const { isAuthenticated } = useSelector(state => state.auth);
+  console.log("books",books);
   useEffect(() => {
     dispatch(getAllBooks({ limit: 50 })); // Tăng limit để có nhiều sách hơn
     dispatch(getAllCategories());
@@ -135,6 +137,17 @@ const Home = () => {
                 </span>
               </div>
             </div>
+            {/* Hiển thị số lượng đã mua cho sách bán chạy */}
+            {variant === 'bestseller' && book.salesCount > 0 && (
+              <div className="flex items-center justify-between mt-1">
+                <div className="flex items-center space-x-1">
+                  <FaShoppingCart className="text-green-500 text-xs" />
+                  <span className="text-xs text-green-600 font-medium">
+                    {book.salesCount} lượt mua
+                  </span>
+                </div>
+              </div>
+            )}
             <div className="mt-1">
               {getDisplayPrice(book)}
             </div>

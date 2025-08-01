@@ -90,6 +90,12 @@ const bookSlice = createSlice({
         clearSelectedBook: (state) => {
             state.selectedBook = null;
         },
+        resetBooks: (state) => {
+            state.books = [];
+            state.pagination = { currentPage: 1, totalPages: 1, totalItems: 0, itemsPerPage: 12 };
+            state.loading = true;
+            state.error = null;
+        },
     },
     extraReducers: (builder) => {
         builder
@@ -188,5 +194,5 @@ const bookSlice = createSlice({
     },
 });
 
-export const { clearBookError, clearSelectedBook } = bookSlice.actions;
+export const { clearBookError, clearSelectedBook, resetBooks } = bookSlice.actions;
 export default bookSlice.reducer;

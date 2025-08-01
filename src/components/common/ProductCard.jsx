@@ -21,7 +21,6 @@ const ProductCard = React.memo(({ product, loading = false, className = '', onAd
     const { id, image, title, price, originalPrice, discount } = product;
     const formatPrice = (p) => {
         if (!p) return '';
-        // Loại bỏ ký tự 'đ' và khoảng trắng, sau đó chuyển đổi sang số
         const numericPrice = parseFloat(p.replace(/[^\d]/g, ''));
         return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(numericPrice);
     };

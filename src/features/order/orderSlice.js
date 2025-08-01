@@ -38,12 +38,19 @@ export const createVnpayPaymentUrlThunk = createAsyncThunk(
 
 export const retryPayment = createAsyncThunk(
     'order/retryPayment',
-    async (orderId, { rejectWithValue }) => {
+    async ({ orderId, confirmCancel }, { rejectWithValue }) => {
         try {
-            const response = await order_service.retryPayment(orderId);
+            const response = await order_service.retryPayment(orderId, confirmCancel);
             toast.success(response.message || 'Tạo URL thanh toán mới thành công!');
             return response.data; // Should return { vnpUrl }
         } catch (error) {
+            // Nếu là cảnh báo xác nhận hủy thì không hiện toast.error
+            if (error?.response?.data?.shouldConfirmCancel) {
+                return rejectWithValue({
+                    shouldConfirmCancel: true,
+                    message: error.response.data.message
+                });
+            }
             const errorMessage = error.response?.data?.message || 'Không thể thử lại thanh toán.';
             toast.error(errorMessage);
             return rejectWithValue(errorMessage);
@@ -84,8 +91,7 @@ export const cancelOrder = createAsyncThunk(
     async (id, { rejectWithValue }) => {
         try {
             const response = await order_service.cancelOrder(id);
-            toast.success(response.message || 'Đơn hàng đã được hủy!');
-            return response.data.order; // { order }
+            return response.data.order;
         } catch (error) {
             const errorMessage = error.response?.data?.message || 'Không thể hủy đơn hàng.';
             toast.error(errorMessage);

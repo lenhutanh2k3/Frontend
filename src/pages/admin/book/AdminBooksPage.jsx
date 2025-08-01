@@ -21,6 +21,7 @@ const AdminBooksPage = () => {
     const { categories } = useSelector((state) => state.category);
     const { authors } = useSelector((state) => state.author);
     const { publishers } = useSelector((state) => state.publisher);
+    // console.log("Current pagination state:", pagination); // Để debug pagination
 
     const [currentPage, setCurrentPage] = useState(pagination.currentPage || 1);
     const [searchTerm, setSearchTerm] = useState('');

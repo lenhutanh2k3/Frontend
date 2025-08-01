@@ -53,7 +53,7 @@ const VerifyOtpPage = () => {
         }
         try {
             await dispatch(forgotPasswordRequest(emailFromForgot)).unwrap();
-            toast.success('Đã gửi lại mã OTP thành công!');
+            
         } catch (err) {
             toast.error('Gửi lại mã OTP thất bại.');
         }

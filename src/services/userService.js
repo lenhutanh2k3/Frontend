@@ -3,7 +3,7 @@ const getUserService = async () => {
     if (!userService) {
         const module = await import('./api');
         const createServiceApi = module.default;
-        userService = createServiceApi(import.meta.env.VITE_USER_SERVICE || 'http://localhost:5000');
+        userService = createServiceApi(import.meta.env.VITE_USER_SERVICE);
     }
     return userService;
 };

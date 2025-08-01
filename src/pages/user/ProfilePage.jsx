@@ -10,6 +10,7 @@ const ProfilePage = () => {
   const dispatch = useDispatch();
   const { user: authUser } = useSelector((state) => state.auth); 
   const { profile, loading: profileLoading, error: profileError } = useSelector((state) => state.profile);
+  console.log(authUser);
   const [profileData, setProfileData] = useState({
     fullName: '',
     email: '',
