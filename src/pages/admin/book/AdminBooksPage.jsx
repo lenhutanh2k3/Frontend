@@ -337,6 +337,7 @@ const AdminBooksPage = () => {
                             <table className="min-w-full divide-y divide-gray-200">
                                 <thead className="bg-gray-100">
                                     <tr>
+                                        <th className="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">STT</th>
                                         <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Ảnh</th>
                                         <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Tiêu đề</th>
                                         <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Tác giả</th>
@@ -349,8 +350,11 @@ const AdminBooksPage = () => {
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-100">
-                                    {books.map((book) => (
+                                    {books.map((book, index) => (
                                         <tr key={book._id} className="hover:bg-blue-50 transition duration-150 ease-in-out">
+                                            <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium text-gray-900">
+                                                {(pagination.currentPage - 1) * pagination.itemsPerPage + index + 1}
+                                            </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <div className="flex items-center justify-center w-10 h-10 rounded-md overflow-hidden bg-gray-200">
                                                     {/* Hiển thị ảnh đầu tiên của sách nếu có */}
@@ -422,14 +426,19 @@ const AdminBooksPage = () => {
                     {/* Phân trang */}
                     {pagination && pagination.totalPages > 0 && (
                         <div className="mt-8 flex justify-center items-center space-x-3">
-                            {/* Nút Previous (tùy chọn) */}
-                            {/* <button
+                            {/* Nút Previous */}
+                            <button
                                 onClick={() => handlePageChange(currentPage - 1)}
                                 disabled={currentPage === 1}
-                                className="px-4 py-2 rounded-full font-semibold bg-gray-200 text-gray-700 hover:bg-gray-300 disabled:opacity-50"
+                                className="px-4 py-2 rounded-full font-semibold bg-gray-200 text-gray-700 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition duration-300 flex items-center"
                             >
+                                <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                                </svg>
                                 Trước
-                            </button> */}
+                            </button>
+                            
+                            {/* Hiển thị số trang */}
                             {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((number) => (
                                 <button
                                     key={number}
@@ -440,14 +449,18 @@ const AdminBooksPage = () => {
                                     {number}
                                 </button>
                             ))}
-                            {/* Nút Next (tùy chọn) */}
-                            {/* <button
+                            
+                            {/* Nút Next */}
+                            <button
                                 onClick={() => handlePageChange(currentPage + 1)}
                                 disabled={currentPage === pagination.totalPages}
-                                className="px-4 py-2 rounded-full font-semibold bg-gray-200 text-gray-700 hover:bg-gray-300 disabled:opacity-50"
+                                className="px-4 py-2 rounded-full font-semibold bg-gray-200 text-gray-700 hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition duration-300 flex items-center"
                             >
-                                Tiếp
-                            </button> */}
+                                Sau
+                                <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                </svg>
+                            </button>
                         </div>
                     )}
                 </>

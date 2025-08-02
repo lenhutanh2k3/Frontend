@@ -1,6 +1,6 @@
 // src/slices/publisher/publisherSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import book_service from '../../services/bookService'; 
+import book_service from '../../services/bookService';
 import { toast } from 'react-toastify';
 
 // Async Thunks cho các thao tác với Publisher
@@ -56,8 +56,7 @@ export const deletePublisher = createAsyncThunk(
     'publisher/deletePublisher',
     async (id, { rejectWithValue }) => {
         try {
-            const response = await book_service.deletePublisher(id); // response: { success, message }
-            // Trả về id để filter trong state và message để hiển thị toast
+            const response = await book_service.deletePublisher(id);
             return { id, message: response.message };
         } catch (error) {
             return rejectWithValue(error.response?.data?.message || error.message);
@@ -101,7 +100,6 @@ const publisherSlice = createSlice({
             .addCase(addPublisher.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
-                toast.error(action.payload);
             })
             // Xử lý Get All Publishers
             .addCase(getAllPublishers.pending, (state) => {
@@ -111,13 +109,12 @@ const publisherSlice = createSlice({
             .addCase(getAllPublishers.fulfilled, (state, action) => {
                 state.loading = false;
                 state.publishers = action.payload.data.publishers;
-                state.pagination= action.payload.data.pagination;
+                state.pagination = action.payload.data.pagination;
                 state.error = null;
             })
             .addCase(getAllPublishers.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
-                toast.error(action.payload);
             })
             // Xử lý Get Publisher By ID
             .addCase(getPublisherById.pending, (state) => {
@@ -133,7 +130,6 @@ const publisherSlice = createSlice({
             .addCase(getPublisherById.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
-                toast.error(action.payload);
             })
             // Xử lý Update Publisher
             .addCase(updatePublisher.pending, (state) => {
@@ -157,7 +153,6 @@ const publisherSlice = createSlice({
             .addCase(updatePublisher.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
-                toast.error(action.payload);
             })
             // Xử lý Delete Publisher
             .addCase(deletePublisher.pending, (state) => {
@@ -178,7 +173,6 @@ const publisherSlice = createSlice({
             .addCase(deletePublisher.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
-                toast.error(action.payload);
             });
     },
 });

@@ -68,6 +68,14 @@ const AdminCreateBookPage = () => {
     // Xử lý thay đổi file input
     const handleFileChange = (e) => {
         const files = Array.from(e.target.files);
+        
+        // Kiểm tra số lượng ảnh
+        if (files.length > 5) {
+            toast.error('Chỉ được chọn tối đa 5 ảnh. Vui lòng chọn lại.');
+            e.target.value = ''; // Reset input
+            return;
+        }
+        
         setSelectedFiles(files); // Lưu các file object
     };
 
@@ -88,6 +96,10 @@ const AdminCreateBookPage = () => {
         }
         if (selectedFiles.length === 0) {
             toast.error('Vui lòng tải lên ít nhất một ảnh cho sách.');
+            return;
+        }
+        if (selectedFiles.length > 5) {
+            toast.error('Chỉ được tải lên tối đa 5 ảnh cho sách.');
             return;
         }
         if (parseFloat(formData.price) <= 0) {
@@ -130,21 +142,24 @@ const AdminCreateBookPage = () => {
                 <div className="md:w-2/3 p-8">
                     <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center md:text-left">Thông tin Sách</h2>
                     <form onSubmit={handleSubmit} className="space-y-6">
+                        {/* Tiêu đề sách ở một hàng riêng */}
+                        <div>
+                            <label htmlFor="title" className="block text-gray-700 text-sm font-semibold mb-2 flex items-center">
+                                <FaBook className="mr-2 text-blue-600" /> Tiêu đề sách <span className="text-red-500 ml-1">*</span>
+                            </label>
+                            <textarea
+                                id="title"
+                                name="title"
+                                value={formData.title}
+                                onChange={handleChange}
+                                placeholder="Nhập tiêu đề sách"
+                                rows={2}
+                                required
+                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent bg-white transition duration-200 resize-y min-h-[60px]"
+                            />
+                        </div>
+                        
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <div>
-                                <Input
-                                    label="Tiêu đề sách"
-                                    id="title"
-                                    type="text"
-                                    name="title"
-                                    value={formData.title}
-                                    onChange={handleChange}
-                                    placeholder="Nhập tiêu đề sách"
-                                    required
-                                    icon={FaBook}
-                                />
-                            </div>
-                            {/* Các trường khác giữ nguyên, loại bỏ trường mô tả khỏi grid này */}
                             <div>
                                 <Input
                                     label="Giá"
@@ -286,7 +301,7 @@ const AdminCreateBookPage = () => {
                         {/* Phần tải ảnh mới */}
                         <div className="mt-6 border-t pt-6 border-gray-200">
                             <label htmlFor="imageUpload" className="block text-gray-700 text-sm font-semibold mb-2 flex items-center">
-                                <FaImage className="mr-2 text-blue-600" /> Tải lên Ảnh sách <span className="text-red-500 ml-1">*</span>
+                                <FaImage className="mr-2 text-blue-600" /> Tải lên Ảnh sách <span className="text-red-500 ml-1">*</span> <span className="text-sm text-gray-500 ml-2">(Tối đa 5 ảnh)</span>
                             </label>
                             <input
                                 id="imageUpload"

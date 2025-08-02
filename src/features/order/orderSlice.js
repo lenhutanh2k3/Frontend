@@ -41,10 +41,9 @@ export const retryPayment = createAsyncThunk(
     async ({ orderId, confirmCancel }, { rejectWithValue }) => {
         try {
             const response = await order_service.retryPayment(orderId, confirmCancel);
-            toast.success(response.message || 'Tạo URL thanh toán mới thành công!');
-            return response.data; // Should return { vnpUrl }
+            toast.success(response.message);
+            return response.data;
         } catch (error) {
-            // Nếu là cảnh báo xác nhận hủy thì không hiện toast.error
             if (error?.response?.data?.shouldConfirmCancel) {
                 return rejectWithValue({
                     shouldConfirmCancel: true,

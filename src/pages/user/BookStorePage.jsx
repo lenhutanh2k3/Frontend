@@ -100,10 +100,34 @@ const BookStorePage = () => {
         }
     }, [error]);
 
-    // Debounced search function: XÓA hoặc bỏ dùng searchQuery
-    // Xử lý tìm kiếm
+    // Cleanup timeout on unmount
+    useEffect(() => {
+        return () => {
+            if (searchTimeoutRef.current) {
+                clearTimeout(searchTimeoutRef.current);
+            }
+        };
+    }, []);
+
+    // Debounced search function
     const handleSearchChange = (e) => {
-        setSearchInput(e.target.value); // chỉ thay đổi input ở trang này
+        const value = e.target.value;
+        setSearchInput(value);
+        
+        // Clear existing timeout
+        if (searchTimeoutRef.current) {
+            clearTimeout(searchTimeoutRef.current);
+        }
+        
+        // Set new timeout for debounced search
+        searchTimeoutRef.current = setTimeout(() => {
+            if (value.trim()) {
+                const params = new URLSearchParams(location.search);
+                params.set('q', value.trim());
+                navigate({ pathname: '/bookstore', search: `?${params.toString()}` });
+                setCurrentPage(1);
+            }
+        }, 500); // 500ms delay
     };
 
     const handleSearchSubmit = (e) => {
@@ -232,31 +256,24 @@ const BookStorePage = () => {
                 {/* Tiêu đề */}
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold text-gray-900 mb-4">Cửa hàng sách</h1>
-                    <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row gap-4">
-                        <div className="flex-1 relative">
-                            <input
-                                type="text"
-                                placeholder="Tìm kiếm sách theo tên sách, tác giả, nhà xuất bản..."
-                                value={searchInput}
-                                onChange={handleSearchChange}
-                                className="w-full p-4 pl-12 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300"
-                            />
-                            <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                            {loading && (
-                                <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
-                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-                                </div>
-                            )}
-                        </div>
-                        <button
-                            type="submit"
-                            className="px-6 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 transition duration-300"
-                        >
-                            <FaSearch />
-                            <span>Tìm kiếm</span>
-                        </button>
-                    </form>
+                    <div className="relative">
+                        <input
+                            type="text"
+                            placeholder="Tìm kiếm sách theo tên sách, tác giả, nhà xuất bản..."
+                            value={searchInput}
+                            onChange={handleSearchChange}
+                            className="w-full p-4 pl-12 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300"
+                        />
+                        <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                        {loading && (
+                            <div className="absolute right-4 top-1/2 transform -translate-y-1/2">
+                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                            </div>
+                        )}
+                    </div>
                 </div>
+
+
 
                 {/* Bộ lọc đang hoạt động */}
                 {isFilterActive && (
@@ -574,26 +591,28 @@ const BookStorePage = () => {
                                             Thử tìm kiếm với từ khóa khác hoặc xóa bộ lọc để xem tất cả sách.
                                         </p>
                                     </div>
-                                    <div className="flex gap-4 justify-center">
-                                        <button 
-                                            onClick={() => {
-                                                // Xóa từ khóa tìm kiếm bằng cách cập nhật URL
-                                                const params = new URLSearchParams(location.search);
-                                                params.delete('q');
-                                                navigate({ pathname: '/bookstore', search: params.toString() ? `?${params.toString()}` : '' });
-                                                setCurrentPage(1);
-                                            }} 
-                                            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300"
-                                        >
-                                            Xóa từ khóa tìm kiếm
-                                        </button>
-                                        <button 
-                                            onClick={resetFilters} 
-                                            className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition duration-300"
-                                        >
-                                            Xóa tất cả bộ lọc
-                                        </button>
-                                    </div>
+                                    {searchInput && (
+                                        <div className="flex gap-4 justify-center">
+                                            <button 
+                                                onClick={() => {
+                                                    setSearchInput('');
+                                                    const params = new URLSearchParams(location.search);
+                                                    params.delete('q');
+                                                    navigate({ pathname: '/bookstore', search: params.toString() ? `?${params.toString()}` : '' });
+                                                    setCurrentPage(1);
+                                                }} 
+                                                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-300"
+                                            >
+                                                Xóa từ khóa tìm kiếm
+                                            </button>
+                                            <button 
+                                                onClick={resetFilters} 
+                                                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition duration-300"
+                                            >
+                                                Xóa tất cả bộ lọc
+                                            </button>
+                                        </div>
+                                    )}
                                 </div>
                             )}
 

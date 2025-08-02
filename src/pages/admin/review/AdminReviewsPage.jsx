@@ -105,7 +105,11 @@ const AdminReviewsPage = () => {
     };
 
     const renderPagination = () => {
-        if (!adminReviewsPagination || adminReviewsPagination.totalPages <= 1) return null;
+        console.log('adminReviewsPagination:', adminReviewsPagination);
+        if (!adminReviewsPagination) {
+            console.log('Không hiển thị pagination vì: Không có pagination');
+            return null;
+        }
 
         const { currentPage, totalPages } = adminReviewsPagination;
 
@@ -116,19 +120,76 @@ const AdminReviewsPage = () => {
                     onClick={() => handlePageChange(currentPage - 1)}
                     disabled={currentPage <= 1}
                     size="sm"
+                    className="px-4 py-2 border rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
                 >
                     Trước
                 </Button>
                 
-                <span className="text-sm text-gray-600">
-                    Trang {currentPage} / {totalPages}
-                </span>
+                {/* Hiển thị số trang thông minh */}
+                {(() => {
+                    const pages = [];
+                    const totalPages = adminReviewsPagination.totalPages;
+                    const current = currentPage;
+
+                    // Luôn hiển thị trang đầu
+                    pages.push(1);
+
+                    if (totalPages <= 7) {
+                        // Nếu ít trang, hiển thị tất cả
+                        for (let i = 2; i <= totalPages; i++) {
+                            pages.push(i);
+                        }
+                    } else {
+                        // Nếu nhiều trang, hiển thị thông minh
+                        if (current > 3) {
+                            pages.push('...');
+                        }
+
+                        const start = Math.max(2, current - 1);
+                        const end = Math.min(totalPages - 1, current + 1);
+
+                        for (let i = start; i <= end; i++) {
+                            if (i !== 1 && i !== totalPages) {
+                                pages.push(i);
+                            }
+                        }
+
+                        if (current < totalPages - 2) {
+                            pages.push('...');
+                        }
+
+                        if (totalPages > 1) {
+                            pages.push(totalPages);
+                        }
+                    }
+
+                    return pages.map((page, index) => (
+                        <div key={index}>
+                            {page === '...' ? (
+                                <span className="px-3 py-2 text-gray-500">...</span>
+                            ) : (
+                                <Button
+                                    onClick={() => handlePageChange(page)}
+                                    className={`px-4 py-2 border rounded-lg ${
+                                        currentPage === page
+                                            ? 'bg-blue-600 text-white border-blue-600'
+                                            : 'border-gray-300 hover:bg-gray-50'
+                                    }`}
+                                    size="sm"
+                                >
+                                    {page}
+                                </Button>
+                            )}
+                        </div>
+                    ));
+                })()}
                 
                 <Button
                     variant="outline"
                     onClick={() => handlePageChange(currentPage + 1)}
                     disabled={currentPage >= totalPages}
                     size="sm"
+                    className="px-4 py-2 border rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
                 >
                     Sau
                 </Button>
@@ -218,10 +279,14 @@ const AdminReviewsPage = () => {
                     </div>
                 ) : (
                     <div className="space-y-4">
-                        {adminReviews.map(review => (
+                        {console.log('adminReviews length:', adminReviews.length)}
+                        {adminReviews.map((review, index) => (
                             <div key={review._id} className="bg-white rounded-lg shadow-sm border p-6">
                                 <div className="flex items-start justify-between mb-4">
                                     <div className="flex items-center space-x-3">
+                                        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-sm font-semibold text-blue-600">
+                                            {(adminReviewsPagination.currentPage - 1) * adminReviewsPagination.itemsPerPage + index + 1}
+                                        </div>
                                         <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
                                             {review.user?.profilePicture ? (
                                                 <img
@@ -305,6 +370,7 @@ const AdminReviewsPage = () => {
 
                 {/* Pagination */}
                 {renderPagination()}
+            
             </div>
         </div>
     );

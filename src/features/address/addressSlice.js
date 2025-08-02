@@ -76,6 +76,14 @@ const addressSlice = createSlice({
             })
             .addCase(createAddress.fulfilled, (state, action) => {
                 state.loading = false;
+                // Nếu địa chỉ mới là mặc định, bỏ mặc định của các địa chỉ cũ
+                if (action.payload.isDefault) {
+                    state.addresses = state.addresses.map(address => ({
+                        ...address,
+                        isDefault: false
+                    }));
+                }
+                // Thêm địa chỉ mới
                 state.addresses.push(action.payload);
             })
             .addCase(createAddress.rejected, (state, action) => {
@@ -88,9 +96,18 @@ const addressSlice = createSlice({
             })
             .addCase(updateAddress.fulfilled, (state, action) => {
                 state.loading = false;
-                state.addresses = state.addresses.map(address =>
-                    address._id === action.payload._id ? action.payload : address
-                );
+                // Nếu địa chỉ được cập nhật thành mặc định, bỏ mặc định của các địa chỉ khác
+                if (action.payload.isDefault) {
+                    state.addresses = state.addresses.map(address => ({
+                        ...address,
+                        isDefault: address._id === action.payload._id ? true : false
+                    }));
+                } else {
+                    // Nếu không phải mặc định, chỉ cập nhật địa chỉ đó
+                    state.addresses = state.addresses.map(address =>
+                        address._id === action.payload._id ? action.payload : address
+                    );
+                }
             })
             .addCase(updateAddress.rejected, (state, action) => {
                 state.loading = false;

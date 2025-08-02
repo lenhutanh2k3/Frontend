@@ -30,12 +30,12 @@ const PaymentErrorPage = () => {
             }
         } catch (error) {
             if (error && error.shouldConfirmCancel) {
-                // KHÔNG hiện toast.error ở đây!
+                
                 if (window.confirm(error.message || 'Bạn đã thanh toán thất bại 3 lần. Bạn có muốn hủy đơn hàng không?')) {
                     try {
                         await dispatch(cancelOrder(orderId)).unwrap();
                         toast.info('Đơn hàng đã bị hủy sau 3 lần thử lại thanh toán không thành công.');
-                        navigate('/order-history');
+                        navigate('/orders');
                     } catch (cancelErr) {
                         toast.error('Không thể hủy đơn hàng.');
                     }

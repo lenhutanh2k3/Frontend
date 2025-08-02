@@ -55,7 +55,7 @@ const OrderHistoryPage = () => {
     const loadOrders = async () => {
         const params = {
             page: currentPage,
-            limit: 10,
+            limit: 5,
             ...(statusFilter && { status: statusFilter }),
             ...(searchTerm && { search: searchTerm }),
             sortBy,
@@ -373,10 +373,12 @@ const OrderHistoryPage = () => {
                     </div>
                 )}
 
+
+
                 {/* Pagination */}
-                {pagination.totalPages > 1 && (
+                {pagination?.totalPages >= 1 && (
                     <div className="mt-8 flex justify-center">
-                        <div className="flex space-x-2">
+                        <div className="flex items-center space-x-2">
                             <Button
                                 onClick={() => handlePageChange(currentPage - 1)}
                                 disabled={currentPage === 1}
@@ -385,19 +387,63 @@ const OrderHistoryPage = () => {
                                 Trước
                             </Button>
                             
-                            {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((page) => (
-                                <Button
-                                    key={page}
-                                    onClick={() => handlePageChange(page)}
-                                    className={`px-4 py-2 border rounded-lg ${
-                                        currentPage === page
-                                            ? 'bg-blue-600 text-white border-blue-600'
-                                            : 'border-gray-300 hover:bg-gray-50'
-                                    }`}
-                                >
-                                    {page}
-                                </Button>
-                            ))}
+                            {/* Hiển thị số trang thông minh */}
+                            {(() => {
+                                const pages = [];
+                                const totalPages = pagination.totalPages;
+                                const current = currentPage;
+                                
+                                // Luôn hiển thị trang đầu
+                                pages.push(1);
+                                
+                                if (totalPages <= 7) {
+                                    // Nếu ít trang, hiển thị tất cả
+                                    for (let i = 2; i <= totalPages; i++) {
+                                        pages.push(i);
+                                    }
+                                } else {
+                                    // Nếu nhiều trang, hiển thị thông minh
+                                    if (current > 3) {
+                                        pages.push('...');
+                                    }
+                                    
+                                    const start = Math.max(2, current - 1);
+                                    const end = Math.min(totalPages - 1, current + 1);
+                                    
+                                    for (let i = start; i <= end; i++) {
+                                        if (i !== 1 && i !== totalPages) {
+                                            pages.push(i);
+                                        }
+                                    }
+                                    
+                                    if (current < totalPages - 2) {
+                                        pages.push('...');
+                                    }
+                                    
+                                    if (totalPages > 1) {
+                                        pages.push(totalPages);
+                                    }
+                                }
+                                
+                                return pages.map((page, index) => (
+                                    <div key={index}>
+                                        {page === '...' ? (
+                                            <span className="px-3 py-2 text-gray-500">...</span>
+                                        ) : (
+                                            <Button
+                                                onClick={() => handlePageChange(page)}
+                                                className={`px-4 py-2 border rounded-lg ${
+                                                    currentPage === page
+                                                        ? 'bg-blue-600 text-white border-blue-600'
+                                                        : 'border-gray-300 hover:bg-gray-50'
+                                                }`}
+                                            >
+                                                {page}
+                                            </Button>
+                                        )}
+                                    </div>
+                                ));
+                            })()}
                             
                             <Button
                                 onClick={() => handlePageChange(currentPage + 1)}
@@ -407,6 +453,8 @@ const OrderHistoryPage = () => {
                                 Sau
                             </Button>
                         </div>
+                        
+                        
                     </div>
                 )}
             </div>

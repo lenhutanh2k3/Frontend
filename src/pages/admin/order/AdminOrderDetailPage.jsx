@@ -113,6 +113,27 @@ const AdminOrderDetailPage = () => {
                                 <p><strong>Tên:</strong> {selectedOrder.fullName}</p>
                                 <p><strong>Số điện thoại:</strong> {selectedOrder.phoneNumber}</p>
                                 <p><strong>Địa chỉ:</strong> {`${selectedOrder.shippingAddress.address}, ${selectedOrder.shippingAddress.ward}, ${selectedOrder.shippingAddress.city}`}</p>
+                                <p><strong>Phương thức thanh toán:</strong> 
+                                    <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${
+                                        selectedOrder.paymentMethod === 'COD' 
+                                            ? 'bg-orange-100 text-orange-800' 
+                                            : selectedOrder.paymentMethod === 'VNPAY'
+                                            ? 'bg-blue-100 text-blue-800'
+                                            : 'bg-gray-100 text-gray-800'
+                                    }`}>
+                                        {selectedOrder.paymentMethod === 'COD' ? 'Thanh toán khi nhận hàng (COD)' : 
+                                         selectedOrder.paymentMethod === 'VNPAY' ? 'Thanh toán qua VNPAY' : 
+                                         selectedOrder.paymentMethod || 'Không xác định'}
+                                    </span>
+                                </p>
+                                <p><strong>Ngày đặt hàng:</strong> {new Date(selectedOrder.createdAt).toLocaleString('vi-VN', {
+                                    year: 'numeric',
+                                    month: '2-digit',
+                                    day: '2-digit',
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                    second: '2-digit'
+                                })}</p>
                             </div>
                             <div className="bg-gray-50 p-4 rounded-lg">
                                 <h2 className="text-lg font-semibold text-gray-700 mb-2">Sản Phẩm</h2>
@@ -167,33 +188,67 @@ const AdminOrderDetailPage = () => {
                                     <span>Tổng thanh toán:</span>
                                     <span className="text-indigo-700">{finalTotal.toLocaleString()} VNĐ</span>
                                 </div>
+                                <hr className="my-2 border-indigo-200" />
+                                <div className="flex justify-between items-center">
+                                    <span>Phương thức thanh toán:</span>
+                                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                                        selectedOrder.paymentMethod === 'COD' 
+                                            ? 'bg-orange-100 text-orange-800' 
+                                            : selectedOrder.paymentMethod === 'VNPAY'
+                                            ? 'bg-blue-100 text-blue-800'
+                                            : 'bg-gray-100 text-gray-800'
+                                    }`}>
+                                        {selectedOrder.paymentMethod === 'COD' ? 'COD' : 
+                                         selectedOrder.paymentMethod === 'VNPAY' ? 'VNPAY' : 
+                                         selectedOrder.paymentMethod || 'N/A'}
+                                    </span>
+                                </div>
                             </div>
                             <div className="bg-gray-50 p-4 rounded-lg">
                                 <h2 className="text-lg font-semibold text-gray-700 mb-2">Trạng Thái</h2>
                                 <p className="mb-2">Trạng thái hiện tại: <span className="font-bold text-indigo-700">{statusMap[selectedOrder.orderStatus] || selectedOrder.orderStatus}</span></p>
-                                <p className="mb-4">Trạng thái thanh toán: <span className="font-bold text-indigo-700">{selectedOrder.paymentStatus === 'Paid' ? 'Đã thanh toán' : 'Chưa thanh toán'}</span></p>
+                                <p className="mb-2">Trạng thái thanh toán: <span className="font-bold text-indigo-700">{selectedOrder.paymentStatus === 'Paid' ? 'Đã thanh toán' : 'Chưa thanh toán'}</span></p>
+                                <p className="mb-4">Cập nhật lần cuối: <span className="font-medium text-gray-600">{new Date(selectedOrder.updatedAt).toLocaleString('vi-VN', {
+                                    year: 'numeric',
+                                    month: '2-digit',
+                                    day: '2-digit',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                })}</span></p>
                                 <div className="grid grid-cols-1 gap-3">
-                                    <Button
-                                        onClick={() => handleStatusUpdate('PROCESSING')}
-                                        disabled={selectedOrder.orderStatus === ORDER_STATUS.PROCESSING || selectedOrder.orderStatus === ORDER_STATUS.DELIVERED || selectedOrder.orderStatus === ORDER_STATUS.CANCELED}
-                                        className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center disabled:opacity-50"
-                                    >
-                                        <FaCheckCircle className="mr-2" /> Đang xử lý
-                                    </Button>
-                                    <Button
-                                        onClick={() => handleStatusUpdate('SHIPPED')}
-                                        disabled={selectedOrder.orderStatus === ORDER_STATUS.SHIPPED || selectedOrder.orderStatus === ORDER_STATUS.DELIVERED || selectedOrder.orderStatus === ORDER_STATUS.CANCELED}
-                                        className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg flex items-center disabled:opacity-50"
-                                    >
-                                        <FaCheckCircle className="mr-2" /> Đã giao
-                                    </Button>
-                                    <Button
-                                        onClick={() => handleStatusUpdate('DELIVERED')}
-                                        disabled={selectedOrder.orderStatus === ORDER_STATUS.DELIVERED || selectedOrder.orderStatus === ORDER_STATUS.CANCELED}
-                                        className="bg-teal-500 hover:bg-teal-600 text-white px-4 py-2 rounded-lg flex items-center disabled:opacity-50"
-                                    >
-                                        <FaCheckCircle className="mr-2" /> Hoàn thành
-                                    </Button>
+                                    {/* Kiểm tra điều kiện thanh toán */}
+                                    {selectedOrder.paymentStatus === 'Paid' || selectedOrder.paymentMethod === 'COD' ? (
+                                        <>
+                                            <Button
+                                                onClick={() => handleStatusUpdate('PROCESSING')}
+                                                disabled={selectedOrder.orderStatus === ORDER_STATUS.PROCESSING || selectedOrder.orderStatus === ORDER_STATUS.DELIVERED || selectedOrder.orderStatus === ORDER_STATUS.CANCELED}
+                                                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center disabled:opacity-50"
+                                            >
+                                                <FaCheckCircle className="mr-2" /> Đang xử lý
+                                            </Button>
+                                            <Button
+                                                onClick={() => handleStatusUpdate('SHIPPED')}
+                                                disabled={selectedOrder.orderStatus === ORDER_STATUS.SHIPPED || selectedOrder.orderStatus === ORDER_STATUS.DELIVERED || selectedOrder.orderStatus === ORDER_STATUS.CANCELED}
+                                                className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg flex items-center disabled:opacity-50"
+                                            >
+                                                <FaCheckCircle className="mr-2" /> Đã giao
+                                            </Button>
+                                            <Button
+                                                onClick={() => handleStatusUpdate('DELIVERED')}
+                                                disabled={selectedOrder.orderStatus === ORDER_STATUS.DELIVERED || selectedOrder.orderStatus === ORDER_STATUS.CANCELED}
+                                                className="bg-teal-500 hover:bg-teal-600 text-white px-4 py-2 rounded-lg flex items-center disabled:opacity-50"
+                                            >
+                                                <FaCheckCircle className="mr-2" /> Hoàn thành
+                                            </Button>
+                                        </>
+                                    ) : (
+                                        <div className="text-center p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                                            <p className="text-yellow-800 font-medium mb-2">⚠️ Chưa thể cập nhật trạng thái</p>
+                                            <p className="text-sm text-yellow-700">
+                                                Đơn hàng chưa thanh toán. Vui lòng chờ khách hàng thanh toán trước khi xử lý.
+                                            </p>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>
