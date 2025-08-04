@@ -10,7 +10,7 @@ export const getUsers = createAsyncThunk(
     async (params = {}, { rejectWithValue }) => {
         try {
             const response = await userService.getUsers(params);
-            return response.data; 
+            return response.data;
         } catch (error) {
             const errorMessage = error.response?.data?.message || 'Không thể lấy danh sách người dùng.';
             toast.error(errorMessage);
@@ -65,9 +65,9 @@ export const updateUser = createAsyncThunk(
 
 export const softDeleteUser = createAsyncThunk(
     'user/softDeleteUser',
-    async (id, { rejectWithValue }) => {
+    async ({ id, reason = null }, { rejectWithValue }) => {
         try {
-            const response = await userService.softDeleteUser(id);
+            const response = await userService.softDeleteUser(id, reason);
             toast.success(response.message || 'Xóa mềm người dùng thành công!');
             return response.data.user; // Trả về user đã được cập nhật isDeleted
         } catch (error) {
@@ -83,7 +83,7 @@ export const restoreUser = createAsyncThunk(
     async (id, { rejectWithValue }) => {
         try {
             const response = await userService.restoreUser(id);
-            return response.data.user; 
+            return response.data.user;
         } catch (error) {
             const errorMessage = error.response?.data?.message || 'Không thể khôi phục người dùng.';
             toast.error(errorMessage);
@@ -109,10 +109,10 @@ export const hardDeleteUser = createAsyncThunk(
 
 export const toggleUserActiveStatus = createAsyncThunk(
     'user/toggleUserActiveStatus',
-    async ({ id, isActive }, { rejectWithValue }) => {
+    async ({ id, isActive, reason = null }, { rejectWithValue }) => {
         try {
-            const response = await userService.toggleUserActiveStatus(id, isActive);
-           
+            const response = await userService.toggleUserActiveStatus(id, isActive, reason);
+
             return response.data.user; // Trả về user đã cập nhật
         } catch (error) {
             const errorMessage = error.response?.data?.message || 'Không thể cập nhật trạng thái người dùng.';
@@ -130,7 +130,7 @@ const userSlice = createSlice({
         selectedUser: null,
         loading: false,
         error: null,
-        pagination:null,
+        pagination: null,
     },
     reducers: {
         clearSelectedUser: (state) => {
@@ -148,7 +148,7 @@ const userSlice = createSlice({
             .addCase(getUsers.fulfilled, (state, action) => {
                 state.loading = false;
                 state.users = action.payload.users || [];
-                state.pagination = action.payload.pagination ;
+                state.pagination = action.payload.pagination;
             })
             .addCase(getUsers.rejected, (state, action) => {
                 state.loading = false;
@@ -192,7 +192,7 @@ const userSlice = createSlice({
                 state.users = state.users.map(user =>
                     user._id === action.payload._id ? action.payload : user
                 );
-                state.selectedUser = action.payload; 
+                state.selectedUser = action.payload;
             })
             .addCase(updateUser.rejected, (state, action) => {
                 state.loading = false;

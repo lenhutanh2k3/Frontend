@@ -52,13 +52,21 @@ const AdminUsersPage = () => {
             toast.warning("Bạn không thể xóa chính mình.");
             return;
         }
-        if (window.confirm('Bạn có chắc chắn muốn xóa mềm người dùng này không?')) {
-            try {
-                await dispatch(softDeleteUser(userId)).unwrap();
-                dispatch(getUsers({ filterBy: filterByStatus, page: currentPage, limit }));
-            } catch (err) {
-                toast.error(err || 'Không thể xóa người dùng.');
-            }
+        
+        // Hỏi lý do xóa
+        const reason = prompt('Nhập lý do xóa tài khoản (để trống nếu không có lý do cụ thể):');
+        
+        // Nếu người dùng hủy (nhấn Cancel), reason sẽ là null
+        if (reason === null) {
+            return; // Thoát khỏi hàm, không thực hiện xóa
+        }
+        
+        try {
+            await dispatch(softDeleteUser({ id: userId, reason: reason || null })).unwrap();
+            toast.success('Xóa mềm người dùng thành công!');
+            dispatch(getUsers({ filterBy: filterByStatus, page: currentPage, limit }));
+        } catch (err) {
+            toast.error(err || 'Không thể xóa người dùng.');
         }
     };
 
@@ -80,14 +88,28 @@ const AdminUsersPage = () => {
             return;
         }
         const action = currentIsActive ? 'vô hiệu hóa' : 'kích hoạt';
-        if (window.confirm(`Bạn có chắc chắn muốn ${action} người dùng này không?`)) {
-            try {
-                await dispatch(toggleUserActiveStatus({ id: userId, isActive: !currentIsActive })).unwrap();
-                toast.success(`${action.charAt(0).toUpperCase() + action.slice(1)} người dùng thành công!`);
-                dispatch(getUsers({ filterBy: filterByStatus, page: currentPage, limit }));
-            } catch (err) {
-                toast.error(err || `Không thể ${action} người dùng.`);
+        
+        // Nếu đang vô hiệu hóa (từ active -> inactive), hỏi lý do
+        let reason = null;
+        if (currentIsActive) { // Nếu user đang active và sẽ bị vô hiệu hóa
+            reason = prompt('Nhập lý do vô hiệu hóa tài khoản (để trống nếu không có lý do cụ thể):');
+            
+            // Nếu người dùng hủy (nhấn Cancel), reason sẽ là null
+            if (reason === null) {
+                return; // Thoát khỏi hàm, không thực hiện vô hiệu hóa
             }
+        }
+        
+        try {
+            await dispatch(toggleUserActiveStatus({ 
+                id: userId, 
+                isActive: !currentIsActive,
+                reason: reason || null 
+            })).unwrap();
+            toast.success(`${action.charAt(0).toUpperCase() + action.slice(1)} người dùng thành công!`);
+            dispatch(getUsers({ filterBy: filterByStatus, page: currentPage, limit }));
+        } catch (err) {
+            toast.error(err || `Không thể ${action} người dùng.`);
         }
     };
 
@@ -193,47 +215,50 @@ const AdminUsersPage = () => {
                                                         {user.isDeleted ? 'Đã xóa' : user.isActive ? 'Kích hoạt' : 'Vô hiệu hóa'}
                                                     </span>
                                                 </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-                                                    <div className="flex justify-center items-center space-x-3">
-                                                        {user.isDeleted ? (
-                                                            <button
-                                                                className="text-blue-600 hover:text-blue-800 p-2 rounded-full hover:bg-blue-100 transition duration-150"
-                                                                onClick={() => handleRestoreUser(user._id)}
-                                                                title="Khôi phục người dùng"
-                                                            >
-                                                                <FaRedo className="text-lg" />
-                                                            </button>
-                                                        ) : (
-                                                            user._id !== currentUser._id ? (
-                                                                <>
-                                                                    <button
-                                                                        className="text-indigo-600 hover:text-indigo-800 p-2 rounded-full hover:bg-indigo-100 transition duration-150"
-                                                                        onClick={() => handleEditUser(user._id)}
-                                                                        title="Chỉnh sửa người dùng"
-                                                                    >
-                                                                        <FaEdit className="text-lg" />
-                                                                    </button>
-                                                                    <button
-                                                                        className="text-red-600 hover:text-red-800 p-2 rounded-full hover:bg-red-100 transition duration-150"
-                                                                        onClick={() => handleDeleteUser(user._id)}
-                                                                        title="Xóa mềm người dùng"
-                                                                    >
-                                                                        <FaTrash className="text-lg" />
-                                                                    </button>
-                                                                    <button
-                                                                        className={`${user.isActive ? 'text-orange-500 hover:text-orange-700' : 'text-green-600 hover:text-green-800'} p-2 rounded-full hover:bg-yellow-100 transition duration-150`}
-                                                                        onClick={() => handleToggleActivate(user._id, user.isActive)}
-                                                                        title={user.isActive ? 'Vô hiệu hóa người dùng' : 'Kích hoạt người dùng'}
-                                                                    >
-                                                                        {user.isActive ? <FaTimes className="text-lg" /> : <FaCheck className="text-lg" />}
-                                                                    </button>
-                                                                </>
-                                                            ) : (
-                                                                <span className="text-xs text-gray-500 italic">Tài khoản đang đăng nhập</span>
-                                                            )
-                                                        )}
-                                                    </div>
-                                                </td>
+                                                                                                 <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                                                     <div className="flex justify-center items-center space-x-3">
+                                                         {user.isDeleted ? (
+                                                             <button
+                                                                 className="text-blue-600 hover:text-blue-800 p-2 rounded-full hover:bg-blue-100 transition duration-150"
+                                                                 onClick={() => handleRestoreUser(user._id)}
+                                                                 title="Khôi phục người dùng"
+                                                             >
+                                                                 <FaRedo className="text-lg" />
+                                                             </button>
+                                                         ) : (
+                                                             user._id !== currentUser._id ? (
+                                                                 <>
+                                                                     <button
+                                                                         className="text-indigo-600 hover:text-indigo-800 p-2 rounded-full hover:bg-indigo-100 transition duration-150"
+                                                                         onClick={() => handleEditUser(user._id)}
+                                                                         title="Chỉnh sửa người dùng"
+                                                                     >
+                                                                         <FaEdit className="text-lg" />
+                                                                     </button>
+                                                                     {/* Chỉ hiển thị nút xóa khi user đang active */}
+                                                                     {user.isActive && (
+                                                                         <button
+                                                                             className="text-red-600 hover:text-red-800 p-2 rounded-full hover:bg-red-100 transition duration-150"
+                                                                             onClick={() => handleDeleteUser(user._id)}
+                                                                             title="Xóa mềm người dùng"
+                                                                         >
+                                                                             <FaTrash className="text-lg" />
+                                                                         </button>
+                                                                     )}
+                                                                     <button
+                                                                         className={`${user.isActive ? 'text-orange-500 hover:text-orange-700' : 'text-green-600 hover:text-green-800'} p-2 rounded-full hover:bg-yellow-100 transition duration-150`}
+                                                                         onClick={() => handleToggleActivate(user._id, user.isActive)}
+                                                                         title={user.isActive ? 'Vô hiệu hóa người dùng' : 'Kích hoạt người dùng'}
+                                                                     >
+                                                                         {user.isActive ? <FaTimes className="text-lg" /> : <FaCheck className="text-lg" />}
+                                                                     </button>
+                                                                 </>
+                                                             ) : (
+                                                                 <span className="text-xs text-gray-500 italic">Tài khoản đang đăng nhập</span>
+                                                             )
+                                                         )}
+                                                     </div>
+                                                 </td>
                                             </tr>
                                         );
                                     })}

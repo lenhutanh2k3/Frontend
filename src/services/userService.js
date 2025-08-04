@@ -164,10 +164,10 @@ const user_service = {
             throw error;
         }
     },
-    softDeleteUser: async (id) => {
+    softDeleteUser: async (id, reason = null) => {
         try {
             const service = await getUserService();
-            const response = await service.put(`/api/users/soft-delete/${id}`);
+            const response = await service.put(`/api/users/soft-delete/${id}`, { reason });
             return response.data;
         } catch (error) {
             throw error;
@@ -192,10 +192,10 @@ const user_service = {
         }
     },
     // THÊM MỚI: Toggle active status cho user
-    toggleUserActiveStatus: async (id, isActive) => {
+    toggleUserActiveStatus: async (id, isActive, reason = null) => {
         try {
             const service = await getUserService();
-            const response = await service.put(`/api/users/status/${id}`, { isActive });
+            const response = await service.put(`/api/users/status/${id}`, { isActive, reason });
             return response.data;
         } catch (error) {
             throw error;
@@ -413,14 +413,6 @@ const user_service = {
     },
 
 
-
-
-    // ==== BÁO CÁO/THỐNG KÊ ADMIN ====
-    // XÓA các hàm:
-    // getRevenueReport
-    // getBestsellerReport
-    // getStockReport
-    // getOrderStatusReport
 };
 
 export default user_service;

@@ -65,6 +65,9 @@ import AdminOrderDetailPage from './pages/admin/order/AdminOrderDetailPage';
 // Review management
 import AdminReviewsPage from './pages/admin/review/AdminReviewsPage';
 
+// Reports
+
+
 const App = () => {
     return (
         <>
@@ -136,7 +139,8 @@ const App = () => {
                         {/* Review Management Routes */}
                         <Route path="reviews" element={<AdminReviewsPage />} />
 
-
+                        {/* Reports Routes */}
+        
 
                     </Route>
                 </Route>

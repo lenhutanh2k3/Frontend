@@ -70,9 +70,7 @@ const ChangePasswordPage = () => {
                         <h1 className="text-3xl font-bold mb-6 border-b-2 border-blue-600 pb-2">
                             Đổi Mật Khẩu
                         </h1>
-                        <p className="text-gray-600 mb-6">
-                            Để đổi mật khẩu, bạn cần xác thực bằng email và sau đó cung cấp mật khẩu hiện tại.
-                        </p>
+                      
 
                         <form onSubmit={handleRequestOtp} className="space-y-6">
                             
