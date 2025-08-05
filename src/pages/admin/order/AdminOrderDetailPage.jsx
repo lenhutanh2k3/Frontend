@@ -13,7 +13,6 @@ const ORDER_STATUS = {
     SHIPPED: 'Shipped',
     DELIVERED: 'Delivered',
     CANCELED: 'Canceled',
-    REFUNDED: 'Refunded'
 };
 
 const AdminOrderDetailPage = () => {
@@ -81,7 +80,7 @@ const AdminOrderDetailPage = () => {
     const statusMap = {
         [ORDER_STATUS.PENDING]: 'Chờ xử lý',
         [ORDER_STATUS.PROCESSING]: 'Đang xử lý',
-        [ORDER_STATUS.SHIPPED]: 'Đã giao',
+        [ORDER_STATUS.SHIPPED]: 'Đang giao hàng',
         [ORDER_STATUS.DELIVERED]: 'Đã giao thành công',
         [ORDER_STATUS.CANCELED]: 'Đã hủy',
         [ORDER_STATUS.REFUNDED]: 'Đã hoàn tiền'
@@ -231,14 +230,14 @@ const AdminOrderDetailPage = () => {
                                                 disabled={selectedOrder.orderStatus === ORDER_STATUS.SHIPPED || selectedOrder.orderStatus === ORDER_STATUS.DELIVERED || selectedOrder.orderStatus === ORDER_STATUS.CANCELED}
                                                 className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg flex items-center disabled:opacity-50"
                                             >
-                                                <FaCheckCircle className="mr-2" /> Đã giao
+                                                <FaCheckCircle className="mr-2" /> Đang giao hàng
                                             </Button>
                                             <Button
                                                 onClick={() => handleStatusUpdate('DELIVERED')}
                                                 disabled={selectedOrder.orderStatus === ORDER_STATUS.DELIVERED || selectedOrder.orderStatus === ORDER_STATUS.CANCELED}
                                                 className="bg-teal-500 hover:bg-teal-600 text-white px-4 py-2 rounded-lg flex items-center disabled:opacity-50"
                                             >
-                                                <FaCheckCircle className="mr-2" /> Hoàn thành
+                                                <FaCheckCircle className="mr-2" /> Đã giao thành công
                                             </Button>
                                         </>
                                     ) : (

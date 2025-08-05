@@ -254,7 +254,7 @@ const OrderHistoryPage = () => {
                         <h3 className="text-xl font-semibold text-gray-800 mb-2">Chưa có đơn hàng nào</h3>
                         <p className="text-gray-600 mb-6">Bạn chưa có đơn hàng nào. Hãy bắt đầu mua sắm!</p>
                         <Button
-                            onClick={() => navigate('/books')}
+                            onClick={() => navigate('/bookstore')}
                             className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
                         >
                             Mua sắm ngay

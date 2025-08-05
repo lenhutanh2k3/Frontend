@@ -27,7 +27,6 @@ import AdminLayout from './layouts/AdminLayout'; // Đảm bảo bạn có file 
 import AdminLoginPage from './pages/admin/AdminLoginPage';
 import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 
-
 import ProtectedRoute from './routes/ProtectedRoute';
 import AdminRoute from './routes/AdminRoute'; // AdminRoute đã được sửa đổi
 import { ToastContainer } from 'react-toastify';
@@ -65,7 +64,9 @@ import AdminOrderDetailPage from './pages/admin/order/AdminOrderDetailPage';
 // Review management
 import AdminReviewsPage from './pages/admin/review/AdminReviewsPage';
 
-// Reports
+
+
+
 
 
 const App = () => {
@@ -139,7 +140,9 @@ const App = () => {
                         {/* Review Management Routes */}
                         <Route path="reviews" element={<AdminReviewsPage />} />
 
-                        {/* Reports Routes */}
+
+
+
         
 
                     </Route>

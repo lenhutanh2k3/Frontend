@@ -119,7 +119,6 @@ const OrderDetailPage = () => {
                     setIsLoading(true);
                     try {
                         await dispatch(cancelOrder(id)).unwrap();
-                        toast.info('Đơn hàng đã bị hủy sau 3 lần thử lại thanh toán không thành công.');
                     } catch (cancelErr) {
                         toast.error('Không thể hủy đơn hàng.');
                     } finally {
@@ -311,11 +310,7 @@ const OrderDetailPage = () => {
                         <span className={`ml-4 px-4 py-2 rounded-full text-base font-semibold ${getStatusColor(selectedOrder.orderStatus)}`}>{getStatusText(selectedOrder.orderStatus)}</span>
                         <span className={`ml-2 px-4 py-2 rounded-full text-base font-semibold ${getPaymentStatusColor(selectedOrder.paymentStatus)}`}>{selectedOrder.paymentStatus === PAYMENT_STATUS.PAID ? 'Đã thanh toán' : 'Chưa thanh toán'}</span>
                     </div>
-                    {/* Xóa các nút in và tải hóa đơn */}
-                    {/* <div className="flex gap-2">
-                        <Button onClick={handlePrintOrder} className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 flex items-center"><FaPrint className="mr-2" />In</Button>
-                        <Button onClick={handleDownloadInvoice} className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center"><FaDownload className="mr-2" />Tải hóa đơn</Button>
-                    </div> */}
+                    
                 </div>
                 <div className="text-gray-600 mb-6">Mã đơn hàng: <span className="font-semibold text-gray-900">#{selectedOrder.orderCode}</span> | Đặt lúc {formatDate(selectedOrder.createdAt)}</div>
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

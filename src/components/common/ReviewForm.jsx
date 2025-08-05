@@ -78,7 +78,7 @@ const ReviewForm = ({
                     orderId,
                     ...formData
                 })).unwrap();
-                toast.success('Gửi đánh giá thành công. Đánh giá của bạn sẽ được admin phê duyệt trước khi hiển thị.');
+                toast.success('Gửi đánh giá thành công.');
             }
 
             if (onSuccess) {

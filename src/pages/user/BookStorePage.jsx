@@ -259,7 +259,7 @@ const BookStorePage = () => {
                     <div className="relative">
                         <input
                             type="text"
-                            placeholder="Tìm kiếm sách theo tên sách, tác giả, nhà xuất bản..."
+                         
                             value={searchInput}
                             onChange={handleSearchChange}
                             className="w-full p-4 pl-12 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300"

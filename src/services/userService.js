@@ -7,7 +7,6 @@ const getUserService = async () => {
     }
     return userService;
 };
-
 const user_service = {
     register: async (data) => {
         try {
@@ -412,6 +411,27 @@ const user_service = {
         }
     },
 
+    // Lấy tổng doanh thu
+    getTotalRevenue: async () => {
+        try {
+            const service = await getUserService();
+            const response = await service.get('/api/users/total-revenue');
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    },
+
+    // Lấy số lượng tài khoản đã xóa mềm
+    getDeletedUsersCount: async () => {
+        try {
+            const service = await getUserService();
+            const response = await service.get('/api/users/deleted-count');
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    }
 
 };
 

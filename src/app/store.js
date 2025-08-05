@@ -13,6 +13,8 @@ import orderSlice from '../features/order/orderSlice';
 import reviewSlice from '../features/review/reviewSlice';
 
 
+
+
 import {
     persistStore,
     persistReducer,
@@ -38,7 +40,7 @@ const rootReducer = combineReducers({
     cart: cartSlice,
     order: orderSlice,
     review: reviewSlice,
-
+    
 });
 
 const persistConfig = {

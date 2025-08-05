@@ -54,16 +54,23 @@ const AdminUsersPage = () => {
         }
         
         // Hỏi lý do xóa
-        const reason = prompt('Nhập lý do xóa tài khoản (để trống nếu không có lý do cụ thể):');
+        const reason = prompt('Nhập lý do xóa tài khoản (không được để trống):');
         
         // Nếu người dùng hủy (nhấn Cancel), reason sẽ là null
         if (reason === null) {
-            return; // Thoát khỏi hàm, không thực hiện xóa
+            toast.info("Hủy thao tác xóa tài khoản.");
+            return; 
+        }
+        
+        // Kiểm tra nếu lý do trống hoặc chỉ có khoảng trắng
+        if (!reason || reason.trim() === '') {
+            toast.error("Vui lòng nhập lý do để xóa tài khoản!");
+            return;
         }
         
         try {
-            await dispatch(softDeleteUser({ id: userId, reason: reason || null })).unwrap();
-            toast.success('Xóa mềm người dùng thành công!');
+            await dispatch(softDeleteUser({ id: userId, reason: reason.trim() })).unwrap();
+            toast.success("Xóa tài khoản thành công!");
             dispatch(getUsers({ filterBy: filterByStatus, page: currentPage, limit }));
         } catch (err) {
             toast.error(err || 'Không thể xóa người dùng.');
@@ -92,11 +99,16 @@ const AdminUsersPage = () => {
         // Nếu đang vô hiệu hóa (từ active -> inactive), hỏi lý do
         let reason = null;
         if (currentIsActive) { // Nếu user đang active và sẽ bị vô hiệu hóa
-            reason = prompt('Nhập lý do vô hiệu hóa tài khoản (để trống nếu không có lý do cụ thể):');
-            
-            // Nếu người dùng hủy (nhấn Cancel), reason sẽ là null
+            reason = prompt('Nhập lý do vô hiệu hóa tài khoản (không được để trống):');  
             if (reason === null) {
-                return; // Thoát khỏi hàm, không thực hiện vô hiệu hóa
+                toast.info("Hủy thao tác vô hiệu hóa tài khoản.");
+                return; 
+            }
+            
+            // Kiểm tra nếu lý do trống hoặc chỉ có khoảng trắng
+            if (!reason || reason.trim() === '') {
+                toast.error("Vui lòng nhập lý do để vô hiệu hóa tài khoản!");
+                return;
             }
         }
         
@@ -104,7 +116,7 @@ const AdminUsersPage = () => {
             await dispatch(toggleUserActiveStatus({ 
                 id: userId, 
                 isActive: !currentIsActive,
-                reason: reason || null 
+                reason: reason ? reason.trim() : null 
             })).unwrap();
             toast.success(`${action.charAt(0).toUpperCase() + action.slice(1)} người dùng thành công!`);
             dispatch(getUsers({ filterBy: filterByStatus, page: currentPage, limit }));
